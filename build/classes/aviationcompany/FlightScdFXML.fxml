@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="homebody" prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TableView fx:id="LstTable" layoutX="26.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="731.0" prefWidth="1209.0" AnchorPane.bottomAnchor="37.0" AnchorPane.leftAnchor="26.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="14.0">
+         <columns>
+            <TableColumn prefWidth="172.0" text="Flight No" />
+            <TableColumn minWidth="0.0" prefWidth="236.0" text="Pick up Location" />
+            <TableColumn prefWidth="176.0" text="Destination Location" />
+            <TableColumn minWidth="7.0" prefWidth="203.0" text="Helicopter Model" />
+            <TableColumn prefWidth="421.0" text="Time" />
+         </columns>
+      </TableView>
+   </children>
+</AnchorPane>

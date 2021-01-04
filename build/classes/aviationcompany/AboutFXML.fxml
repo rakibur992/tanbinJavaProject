@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane id="AnchorPane" prefHeight="830.0" prefWidth="1260.0" style="-fx-background-color: #43494E;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Text fill="WHITE" layoutX="246.0" layoutY="283.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Confarence Management System (CMS) Design By Tanbin Harun Al Rashid" AnchorPane.bottomAnchor="541.2275390625" AnchorPane.leftAnchor="246.0" AnchorPane.rightAnchor="259.896484375" AnchorPane.topAnchor="258.1806640625">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Text>
+      <Text fill="WHITE" layoutX="246.0" layoutY="318.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Warning: This computer program is protected by copyright laws and international treaties. Unauthorized reproduction or distribution of this program, or any portion of it, may result in severe civil and criminal penalties, and will be prosecuted to the maximum extent possible under law." wrappingWidth="754.1035205125809" AnchorPane.bottomAnchor="541.2275390625" AnchorPane.leftAnchor="246.0" AnchorPane.rightAnchor="259.896484375" AnchorPane.topAnchor="301.8134765625">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Text>
+   </children>
+</AnchorPane>

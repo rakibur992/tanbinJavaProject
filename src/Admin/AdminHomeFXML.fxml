@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="830.0" prefWidth="1260.0" style="-fx-background-color: #43494E;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.AdminHomeFXMLController">
+   <children>
+      <HBox spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <Button fx:id="allFlightScd" depthTest="ENABLE" mnemonicParsing="false" onAction="#allFlightScdA" prefHeight="29.0" prefWidth="174.0" style="-fx-background-color: #E02840;" text="Show All Flight Schedule " textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="flightChangeScd" depthTest="ENABLE" mnemonicParsing="false" onAction="#flightChangeScdAction" prefHeight="29.0" prefWidth="275.0" style="-fx-background-color: #E02840;" text="Show Flight  Schedule Change Request" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Button>
+            <Button fx:id="showUser" depthTest="ENABLE" mnemonicParsing="false" onAction="#showUserAction" prefHeight="12.0" prefWidth="133.0" style="-fx-background-color: #E02840;" text="Show User" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Button>
+         </children>
+         <padding>
+            <Insets left="10.0" top="10.0" />
+         </padding>
+      </HBox>
+      <AnchorPane fx:id="homebody" layoutX="6.0" layoutY="49.0" prefHeight="781.0" prefWidth="1253.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="49.0" />
+   </children>
+</AnchorPane>

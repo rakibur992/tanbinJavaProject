@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="855.0" prefWidth="1260.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Admin.AdminFXMLController">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu fx:id="home" mnemonicParsing="false" text="Home">
+               <items>
+              <MenuItem fx:id="goHome" mnemonicParsing="false" onAction="#goHomeAction" text="Go To Home" />
+                  <MenuItem fx:id="logOut" mnemonicParsing="false" onAction="#logOut" text="Log Out" />
+               </items></Menu>
+            <Menu fx:id="Accounts" mnemonicParsing="false" text="Accounts">
+               <items>
+                  <MenuItem fx:id="createAc" mnemonicParsing="false" onAction="#createAcAction" text="Create Accounts" />
+                  <MenuItem fx:id="myAc" mnemonicParsing="false" onAction="#myAcAction" text="My Accounts" />
+               </items>
+            </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+               <items>
+                  <MenuItem fx:id="about" mnemonicParsing="false" onAction="#aboutAction" text="About" />
+               </items></Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <center>
+      <ScrollPane fx:id="body" fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>
