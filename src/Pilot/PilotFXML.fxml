@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="855.0" prefWidth="1260.0" style="-fx-background-color: #43494E;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Pilot.PilotFXMLController">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+         <menus>
+            <Menu fx:id="home" mnemonicParsing="false" text="Home">
+               <items>
+                  <MenuItem fx:id="goHome" mnemonicParsing="false" onAction="#goHomeAction" text="Go To Home" />
+                  <MenuItem fx:id="logOut" mnemonicParsing="false" onAction="#logOut" text="Log Out" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Help">
+               <items>
+                  <MenuItem fx:id="about" mnemonicParsing="false" onAction="#aboutAction" text="About" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+   </top>
+   <center>
+      <ScrollPane fx:id="body" fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </center>
+   <left>
+      <VBox prefHeight="830.0" prefWidth="179.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="fightScd" depthTest="ENABLE" mnemonicParsing="false" onAction="#flightScdA" prefHeight="29.0" prefWidth="173.0" style="-fx-background-color: #E02840;" text="Flight Schedule " textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="helicopterDetail" depthTest="ENABLE" mnemonicParsing="false" onAction="#helicopterDetailAction" prefHeight="29.0" prefWidth="174.0" style="-fx-background-color: #E02840;" text="Helicopter Detail" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="flightHis" depthTest="ENABLE" mnemonicParsing="false" onAction="#flightHisAc" prefHeight="29.0" prefWidth="174.0" style="-fx-background-color: #E02840;" text="Flight History" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="changeWorkTime" depthTest="ENABLE" mnemonicParsing="false" onAction="#changeWorkTimeA" prefHeight="29.0" prefWidth="174.0" style="-fx-background-color: #E02840;" text="Change Work Timing" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="feedback" depthTest="ENABLE" mnemonicParsing="false" onAction="#feedbackA" prefHeight="29.0" prefWidth="174.0" style="-fx-background-color: #E02840;" text="Flight Feedback" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+      </VBox>
+   </left>
+</BorderPane>

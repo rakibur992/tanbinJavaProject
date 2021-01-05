@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
@@ -48,6 +49,16 @@ public class AdminFXMLController implements Initializable {
 
     @FXML
     private ScrollPane body;
+    @FXML
+    private Button FlightScd;
+    @FXML
+    private Button allFlightScd1;
+    @FXML
+    private Button allFlightScd2;
+    @FXML
+    private Button allFlightScd3;
+    @FXML
+    private Button allFlightScd4;
 
     @FXML
     void createAcAction(ActionEvent event) throws IOException {
@@ -101,6 +112,14 @@ public class AdminFXMLController implements Initializable {
             Logger.getLogger(AdminFXMLController.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+    }
+
+    @FXML
+    private void FlightScdA(ActionEvent event) {
+    }
+
+    @FXML
+    private void allFlightScdA(ActionEvent event) {
     }
 
 }

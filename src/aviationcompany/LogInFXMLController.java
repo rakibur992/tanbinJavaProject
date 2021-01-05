@@ -63,7 +63,7 @@ public class LogInFXMLController implements Initializable {
             window.show();
         }
         else if("management".equals(userID.getText())){
-            Parent admin = FXMLLoader.load(getClass().getResource("/chair/ChairFXML.fxml"));
+            Parent admin = FXMLLoader.load(getClass().getResource(""));
             Scene adminScene = new Scene(admin);
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
             window.setScene(adminScene);
@@ -72,7 +72,7 @@ public class LogInFXMLController implements Initializable {
             
         } 
         else if("client".equals(userID.getText())){
-            Parent admin = FXMLLoader.load(getClass().getResource("/reviewer/ReviewerFXML.fxml"));
+            Parent admin = FXMLLoader.load(getClass().getResource("/Client/ClientFXML.fxml"));
             Scene adminScene = new Scene(admin);
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
             window.setScene(adminScene);
@@ -81,7 +81,7 @@ public class LogInFXMLController implements Initializable {
             
         } 
         else if("lendingCompany".equals(userID.getText())){
-            Parent admin = FXMLLoader.load(getClass().getResource("/author/AuthorFXML.fxml"));
+            Parent admin = FXMLLoader.load(getClass().getResource(""));
             Scene adminScene = new Scene(admin);
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
             window.setScene(adminScene);
@@ -90,7 +90,7 @@ public class LogInFXMLController implements Initializable {
             
         } 
         else if("pilot".equals(userID.getText())){
-            Parent admin = FXMLLoader.load(getClass().getResource("/Visitor/VisitorFXML.fxml"));
+            Parent admin = FXMLLoader.load(getClass().getResource("/Pilot/PilotFXML.fxml"));
             Scene adminScene = new Scene(admin);
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
             window.setScene(adminScene);

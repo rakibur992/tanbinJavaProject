@@ -10,7 +10,7 @@
    <children>
       <HBox spacing="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Button fx:id="allFlightScd" depthTest="ENABLE" mnemonicParsing="false" onAction="#allFlightScdA" prefHeight="29.0" prefWidth="147.0" style="-fx-background-color: #E02840;" text="Show All Flight Schedule " textFill="WHITE">
+            <Button fx:id="allFlightScd" depthTest="ENABLE" mnemonicParsing="false" onAction="#allFlightScdA" prefHeight="29.0" prefWidth="174.0" style="-fx-background-color: #E02840;" text="Show All Flight Schedule " textFill="WHITE">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font>
