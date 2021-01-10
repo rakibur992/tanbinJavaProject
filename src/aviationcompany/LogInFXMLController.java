@@ -63,7 +63,7 @@ public class LogInFXMLController implements Initializable {
             window.show();
         }
         else if("management".equals(userID.getText())){
-            Parent admin = FXMLLoader.load(getClass().getResource(""));
+            Parent admin = FXMLLoader.load(getClass().getResource("/BookingManagement/BookingManagementFXML.fxml"));
             Scene adminScene = new Scene(admin);
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
             window.setScene(adminScene);
@@ -81,7 +81,7 @@ public class LogInFXMLController implements Initializable {
             
         } 
         else if("lendingCompany".equals(userID.getText())){
-            Parent admin = FXMLLoader.load(getClass().getResource(""));
+            Parent admin = FXMLLoader.load(getClass().getResource("/LendingCompany/LendingCompanyFXML.fxml"));
             Scene adminScene = new Scene(admin);
             Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
             window.setScene(adminScene);

@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 public class ClientFXMLController {
@@ -42,7 +43,9 @@ public class ClientFXMLController {
     private Button feedback;
 
     @FXML
-    void aboutAction(ActionEvent event) {
+    void aboutAction(ActionEvent event) throws IOException {
+        AnchorPane pane = FXMLLoader.load(getClass().getResource("/aviationcompany/AboutFXML.fxml"));
+        body.setContent(pane);
 
     }
 

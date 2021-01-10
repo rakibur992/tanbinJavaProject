@@ -1,4 +1,4 @@
-package Pilot;
+package LendingCompany;
 
 import java.io.IOException;
 import javafx.event.ActionEvent;
@@ -13,7 +13,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-public class PilotFXMLController {
+public class LendingCompanyFXMLController {
 
     @FXML
     private Menu home;
@@ -25,28 +25,22 @@ public class PilotFXMLController {
     private MenuItem logOut;
 
     @FXML
-    private MenuItem myAc;
-
-    @FXML
     private MenuItem about;
 
     @FXML
     private ScrollPane body;
 
     @FXML
-    private Button fightScd;
+    private Button addHelicopter;
 
     @FXML
-    private Button helicopterDetail;
+    private Button modifyHelicopter;
 
     @FXML
-    private Button flightHis;
+    private Button checkBookStatus;
 
     @FXML
-    private Button changeWorkTime;
-
-    @FXML
-    private Button feedback;
+    private Button bookingConfirmation;
 
     @FXML
     void aboutAction(ActionEvent event) throws IOException {
@@ -56,35 +50,22 @@ public class PilotFXMLController {
     }
 
     @FXML
-    void changeWorkTimeA(ActionEvent event) {
-
-    }
-
-
-    @FXML
-    void feedbackA(ActionEvent event) {
+    void addHelicopterA(ActionEvent event) {
 
     }
 
     @FXML
-    void flightHisAc(ActionEvent event) {
+    void bookingConfirmationA(ActionEvent event) {
 
     }
 
     @FXML
-    void flightScdA(ActionEvent event) throws IOException {
-        AnchorPane pane = FXMLLoader.load(getClass().getResource("/aviationcompany/FlightScdFXML.fxml"));
-        body.setContent(pane);
+    void changeFlightSchAction(ActionEvent event) {
 
     }
 
     @FXML
     void goHomeAction(ActionEvent event) {
-
-    }
-
-    @FXML
-    void helicopterDetailAction(ActionEvent event) {
 
     }
 
@@ -96,11 +77,10 @@ public class PilotFXMLController {
         window.setScene(logInScene);
         window.setTitle("Aviation LogIn");
         window.show();
-
     }
 
     @FXML
-    void myAcAction(ActionEvent event) {
+    void viewDelHelicopterAction(ActionEvent event) {
 
     }
 
