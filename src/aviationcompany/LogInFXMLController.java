@@ -5,11 +5,13 @@
  */
 package aviationcompany;
 
-
-
+import MD5.MD5;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,12 +33,8 @@ import javafx.stage.Stage;
 public class LogInFXMLController implements Initializable {
 
     @FXML
-    private ResourceBundle resources;
-    @FXML
     private AnchorPane logInPane;
 
-    @FXML
-    private URL location;
 
     @FXML
     private TextField userID;
@@ -49,55 +47,78 @@ public class LogInFXMLController implements Initializable {
 
     @FXML
     private Button register;
+    @FXML
+    private Label error;
 
     @FXML
 
     void handleLogInBtn(ActionEvent event) throws IOException {
-        
-        if ("admin".equals(userID.getText())) {
-            Parent admin = FXMLLoader.load(getClass().getResource("/Admin/AdminFXML.fxml"));
-            Scene adminScene = new Scene(admin);
-            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            window.setScene(adminScene);
-            window.setTitle("Aviation Admin");
-            window.show();
+
+        File file = new File("user.txt");
+        Scanner sc = new Scanner(file);
+        MD5 md5 = new MD5();
+        String data;
+        while (sc.hasNextLine()) {
+            data = sc.nextLine();
+            String[] dataArr = data.split(",");
+            String pass_check = md5.getMd5(pass.getText());
+            if (dataArr[1].equals(userID.getText()) && dataArr[2].equals(pass_check)) {
+                switch (dataArr[4]) {
+                    case "admin": {
+                        Parent admin = FXMLLoader.load(getClass().getResource("/Admin/AdminFXML.fxml"));
+                        Scene adminScene = new Scene(admin);
+                        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                        window.setScene(adminScene);
+                        window.setTitle("Aviation Admin");
+                        window.show();
+                        break;
+                    }
+
+                    case "management": {
+                        Parent admin = FXMLLoader.load(getClass().getResource("/BookingManagement/BookingManagementFXML.fxml"));
+                        Scene adminScene = new Scene(admin);
+                        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                        window.setScene(adminScene);
+                        window.setTitle("Aviation Managment");
+                        window.show();
+                        break;
+                    }
+                    case "client": {
+                        Parent admin = FXMLLoader.load(getClass().getResource("/Client/ClientFXML.fxml"));
+                        Scene adminScene = new Scene(admin);
+                        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                        window.setScene(adminScene);
+                        window.setTitle("Aviation  Client");
+                        window.show();
+                        break;
+                    }
+                    case "lendingCompany": {
+                        Parent admin = FXMLLoader.load(getClass().getResource("/LendingCompany/LendingCompanyFXML.fxml"));
+                        Scene adminScene = new Scene(admin);
+                        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                        window.setScene(adminScene);
+                        window.setTitle("Aviation Client");
+                        window.show();
+                        break;
+                    }
+                    case "pilot": {
+                        Parent admin = FXMLLoader.load(getClass().getResource("/Pilot/PilotFXML.fxml"));
+                        Scene adminScene = new Scene(admin);
+                        Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                        window.setScene(adminScene);
+                        window.setTitle("Aviation Pilot");
+                        window.show();
+                        break;
+                    }
+
+                }
+                
+
+            }
         }
-        else if("management".equals(userID.getText())){
-            Parent admin = FXMLLoader.load(getClass().getResource("/BookingManagement/BookingManagementFXML.fxml"));
-            Scene adminScene = new Scene(admin);
-            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            window.setScene(adminScene);
-            window.setTitle("Aviation Managment");
-            window.show();
-            
-        } 
-        else if("client".equals(userID.getText())){
-            Parent admin = FXMLLoader.load(getClass().getResource("/Client/ClientFXML.fxml"));
-            Scene adminScene = new Scene(admin);
-            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            window.setScene(adminScene);
-            window.setTitle("Aviation  Client");
-            window.show();
-            
-        } 
-        else if("lendingCompany".equals(userID.getText())){
-            Parent admin = FXMLLoader.load(getClass().getResource("/LendingCompany/LendingCompanyFXML.fxml"));
-            Scene adminScene = new Scene(admin);
-            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            window.setScene(adminScene);
-            window.setTitle("Aviation Client");
-            window.show();
-            
-        } 
-        else if("pilot".equals(userID.getText())){
-            Parent admin = FXMLLoader.load(getClass().getResource("/Pilot/PilotFXML.fxml"));
-            Scene adminScene = new Scene(admin);
-            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            window.setScene(adminScene);
-            window.setTitle("Aviation Pilot");
-            window.show();
-            
-        } 
+        error.setText("Username/Password Incorrect");
+       
+   
 
 //        MD5 md5=new MD5();
 //        System.out.println(md5.getMd5(pass.getText()));

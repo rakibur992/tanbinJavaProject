@@ -62,7 +62,7 @@ public class AdminFXMLController implements Initializable {
 
     @FXML
     void createAcAction(ActionEvent event) throws IOException {
-        AnchorPane logInPane = FXMLLoader.load(getClass().getResource("/aviationcompany/CreateAcFXML.fxml"));
+        AnchorPane logInPane = FXMLLoader.load(getClass().getResource("CreateAcFXML.fxml"));
         body.setContent(logInPane);
 
     }

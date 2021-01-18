@@ -24,6 +24,7 @@
          <children>
             <TextField fx:id="userID" alignment="CENTER" promptText="Username" />
             <PasswordField fx:id="pass" alignment="TOP_CENTER" promptText="Password" />
+            <Label fx:id="error" textFill="WHITE" />
             <Button fx:id="login" mnemonicParsing="false" onAction="#handleLogInBtn" prefHeight="37.0" prefWidth="173.0" style="-fx-background-color: #E02840;" text="Log In" textFill="WHITE">
                <font>
                   <Font size="16.0" />

@@ -20,6 +20,8 @@ public class AviationCompany extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
+       
+        
         Parent root = FXMLLoader.load(getClass().getResource("LogInFXML.fxml"));
         Scene scene = new Scene(root);
         Image icon =new Image(getClass().getResourceAsStream("/img/img.jpg"));

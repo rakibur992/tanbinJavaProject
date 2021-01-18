@@ -3,39 +3,38 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package aviationcompany;
+package Admin;
 
 import MD5.MD5;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import static java.lang.Thread.sleep;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
 /**
  * FXML Controller class
  *
  * @author Tanbin
  */
-public class RegisterFXMLController implements Initializable {
-    
-    @FXML
-    private AnchorPane regPane;
-
-    @FXML
+public class CreateAcFXMLController implements Initializable {
+ @FXML
     private TextField userName;
 
     @FXML
@@ -51,38 +50,38 @@ public class RegisterFXMLController implements Initializable {
     private TextField email;
 
     @FXML
+    private ChoiceBox acType;
+
+    @FXML
     private Button register;
+    
+    ObservableList<String> acTypeList=FXCollections.observableArrayList("Choose Account Type","pilot","lendingCompany","management");
     @FXML
     private Label error;
 
     @FXML
-    void registerAction(ActionEvent event) throws IOException {
+    void registerAction(ActionEvent event) throws IOException, InterruptedException {
         File file = new File("user.txt");
         FileWriter fw= new FileWriter(file,true);
         PrintWriter pw=new PrintWriter(fw);
         MD5 md5=new MD5();
         if (pass.getText().equals(cpass.getText())) {
-            String data=userName.getText()+","+userID.getText()+","+md5.getMd5(pass.getText())+","+email.getText()+","+"client";
+            String data=userName.getText()+","+userID.getText()+","+md5.getMd5(pass.getText())+","+email.getText()+","+acType.getValue();
             pw.println(data);
             pw.close();
-            Parent logIn = FXMLLoader.load(getClass().getResource("LogInFXML.fxml"));
-            Scene logInScene = new Scene(logIn);
-            Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            window.setScene(logInScene);
-            window.setTitle("Aviation LogIn");
-            window.show();
-            
+            error.setText("Account Created"); 
         }
         else{
             error.setText("Password Mismatch");
-            pw.close();
         }
-        
 
     }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        acType.setValue("Choose Account Type");
+        acType.setItems(acTypeList);
+        
     }    
     
 }
