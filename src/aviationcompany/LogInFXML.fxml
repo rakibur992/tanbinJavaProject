@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" fx:id="logInPane" prefHeight="524.0" prefWidth="352.0" style="-fx-background-color: #43494E;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aviationcompany.LogInFXMLController">
+<AnchorPane id="AnchorPane" fx:id="logInPane" onMouseClicked="#errorDis" prefHeight="524.0" prefWidth="352.0" style="-fx-background-color: #43494E;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aviationcompany.LogInFXMLController">
     <children>
       <HBox alignment="TOP_CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>

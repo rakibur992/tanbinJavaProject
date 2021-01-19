@@ -5,13 +5,26 @@
  */
 package aviationcompany;
 
+import JavaClass.Admin;
+import JavaClass.LendingCompany;
+import JavaClass.Data;
+import JavaClass.User;
+import LendingCompany.AddHelicopterFXMLController;
+import LendingCompany.LendingCompanyFXMLController;
 import MD5.MD5;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,6 +36,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -34,7 +48,6 @@ public class LogInFXMLController implements Initializable {
 
     @FXML
     private AnchorPane logInPane;
-
 
     @FXML
     private TextField userID;
@@ -62,10 +75,55 @@ public class LogInFXMLController implements Initializable {
             data = sc.nextLine();
             String[] dataArr = data.split(",");
             String pass_check = md5.getMd5(pass.getText());
+            FXMLLoader loader = new FXMLLoader();
+
             if (dataArr[1].equals(userID.getText()) && dataArr[2].equals(pass_check)) {
+                try {
+                    ObjectInputStream is = new ObjectInputStream(new FileInputStream(dataArr[1] + ".bin"));
+                    Data.user = (User) is.readObject();
+
+                } catch (FileNotFoundException ex) {
+                    switch (dataArr[4]) {
+                        case "admin": {
+                            Admin user = new Admin(dataArr[0], dataArr[1], dataArr[2], dataArr[3], dataArr[4]);
+                            ObjectOutputStream os =new ObjectOutputStream(new FileOutputStream(dataArr[1]+".bin"));
+                            os.writeObject(user);
+                            Data.user=user;
+                            break;
+                        }
+
+                        case "management": {
+
+                            break;
+                        }
+                        case "client": {
+
+                            break;
+                        }
+                        case "lendingCompany": {
+                            LendingCompany user = new LendingCompany(dataArr[0], dataArr[1], dataArr[2], dataArr[3], dataArr[4]);              
+                            ObjectOutputStream os =new ObjectOutputStream(new FileOutputStream(dataArr[1]+".bin"));
+                            os.writeObject(user);
+                            Data.user=user;
+
+                            break;
+                        }
+                        case "pilot": {
+
+                            break;
+                        }
+
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(AddHelicopterFXMLController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(AddHelicopterFXMLController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
                 switch (dataArr[4]) {
                     case "admin": {
-                        Parent admin = FXMLLoader.load(getClass().getResource("/Admin/AdminFXML.fxml"));
+                        loader.setLocation(getClass().getResource("/Admin/AdminFXML.fxml"));
+                        Parent admin = loader.load();
                         Scene adminScene = new Scene(admin);
                         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
                         window.setScene(adminScene);
@@ -75,7 +133,9 @@ public class LogInFXMLController implements Initializable {
                     }
 
                     case "management": {
-                        Parent admin = FXMLLoader.load(getClass().getResource("/BookingManagement/BookingManagementFXML.fxml"));
+
+                        loader.setLocation(getClass().getResource("/BookingManagement/BookingManagementFXML.fxml"));
+                        Parent admin = loader.load();
                         Scene adminScene = new Scene(admin);
                         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
                         window.setScene(adminScene);
@@ -84,7 +144,9 @@ public class LogInFXMLController implements Initializable {
                         break;
                     }
                     case "client": {
-                        Parent admin = FXMLLoader.load(getClass().getResource("/Client/ClientFXML.fxml"));
+
+                        loader.setLocation(getClass().getResource("/Client/ClientFXML.fxml"));
+                        Parent admin = loader.load();
                         Scene adminScene = new Scene(admin);
                         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
                         window.setScene(adminScene);
@@ -93,16 +155,20 @@ public class LogInFXMLController implements Initializable {
                         break;
                     }
                     case "lendingCompany": {
-                        Parent admin = FXMLLoader.load(getClass().getResource("/LendingCompany/LendingCompanyFXML.fxml"));
+                        
+                        loader.setLocation(getClass().getResource("/LendingCompany/LendingCompanyFXML.fxml"));
+                        Parent admin = loader.load();
                         Scene adminScene = new Scene(admin);
                         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
                         window.setScene(adminScene);
-                        window.setTitle("Aviation Client");
+                        window.setTitle("Aviation Lending Company");
                         window.show();
                         break;
                     }
                     case "pilot": {
-                        Parent admin = FXMLLoader.load(getClass().getResource("/Pilot/PilotFXML.fxml"));
+
+                        loader.setLocation(getClass().getResource("/Pilot/PilotFXML.fxml"));
+                        Parent admin = loader.load();
                         Scene adminScene = new Scene(admin);
                         Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
                         window.setScene(adminScene);
@@ -112,13 +178,10 @@ public class LogInFXMLController implements Initializable {
                     }
 
                 }
-                
 
             }
         }
         error.setText("Username/Password Incorrect");
-       
-   
 
 //        MD5 md5=new MD5();
 //        System.out.println(md5.getMd5(pass.getText()));
@@ -141,6 +204,12 @@ public class LogInFXMLController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+    }
+
+    @FXML
+    private void errorDis(MouseEvent event) {
+        error.setText("");
+
     }
 
 }
