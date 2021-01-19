@@ -105,6 +105,10 @@ public class AddBookingFXMLController implements Initializable {
         String s="Pending";
         cl.addBooking(hModel.getText(), pickLoc.getText(), desLoc.getText(), time.getText(),pickDate.getValue(),s);
         Data.user=cl;
+        hModel.setText("");
+        pickLoc.setText("");
+        desLoc.setText("");
+        time.setText("");
     }
     
 }

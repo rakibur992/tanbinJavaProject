@@ -68,6 +68,10 @@ public class AddHelicopterFXMLController implements Initializable {
         String data=hModel.getText()+","+maxPassaengerCapacity.getText()+","+maxWeight.getText()+","+ availableDate.getValue();
         pw.println(data);
         pw.close();
+        hModel.setText("");
+        maxPassaengerCapacity.setText("");
+        maxWeight.setText("");
+        
       
        
         
