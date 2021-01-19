@@ -9,6 +9,10 @@ package JavaClass;
  *
  * @author Rakib
  */
-public class Management {
+public class Management extends User{
+    
+    public Management(String name, String userName, String pass, String email, String type) {
+        super(name, userName, pass, email, type);
+    }
     
 }

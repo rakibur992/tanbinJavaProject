@@ -9,6 +9,8 @@ import JavaClass.Admin;
 import JavaClass.Client;
 import JavaClass.LendingCompany;
 import JavaClass.Data;
+import JavaClass.Management;
+import JavaClass.Pilot;
 import JavaClass.User;
 import LendingCompany.AddHelicopterFXMLController;
 import LendingCompany.LendingCompanyFXMLController;
@@ -94,6 +96,10 @@ public class LogInFXMLController implements Initializable {
                         }
 
                         case "management": {
+                            Management user = new Management (dataArr[0], dataArr[1], dataArr[2], dataArr[3], dataArr[4]);
+                            ObjectOutputStream os =new ObjectOutputStream(new FileOutputStream(dataArr[1]+".bin"));
+                            os.writeObject(user);
+                            Data.user=user;
 
                             break;
                         }
@@ -114,7 +120,10 @@ public class LogInFXMLController implements Initializable {
                             break;
                         }
                         case "pilot": {
-
+                            Pilot user = new Pilot(dataArr[0], dataArr[1], dataArr[2], dataArr[3], dataArr[4]);              
+                            ObjectOutputStream os =new ObjectOutputStream(new FileOutputStream(dataArr[1]+".bin"));
+                            os.writeObject(user);
+                            Data.user=user;
                             break;
                         }
 

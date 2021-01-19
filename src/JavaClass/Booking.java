@@ -5,13 +5,14 @@
  */
 package JavaClass;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
  *
  * @author Rakib
  */
-public class Booking {
+public class Booking implements Serializable{
     private LocalDate pickUpDate;
     private String model,pickUpLoc,destinationLoc,time,status;
     

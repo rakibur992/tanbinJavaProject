@@ -71,7 +71,28 @@ public class LendingCompanyFXMLController implements Initializable{
         lc=(LendingCompany) Data.user;
         
     }
+    void helicopInfoTable(){
+        TableView<Helicopter> tableView=new TableView();
+        TableColumn<Helicopter, String> model= new TableColumn<>("Model");
+        TableColumn<Helicopter,String> passengerCapacity = new TableColumn<>("Passanger Capacity");
+        TableColumn<Helicopter,String> maxWeight= new TableColumn<>("Maximum Weight");
+        TableColumn<Helicopter, LocalDate> avialableData= new TableColumn<>("Avaiable Date");
+        //set up the columns in the table
+        model.setCellValueFactory(new PropertyValueFactory<>("model"));
+        passengerCapacity.setCellValueFactory(new PropertyValueFactory<>("maxPassCap"));
+        maxWeight.setCellValueFactory(new PropertyValueFactory<>("maxWeight"));
+        avialableData.setCellValueFactory(new PropertyValueFactory<>("availableDate"));
+        lc=(LendingCompany) Data.user;
+        ObservableList<Helicopter> ol=FXCollections.observableArrayList(lc.helicopteList);
+        tableView.setItems(ol);
+        tableView.getColumns().addAll(model,passengerCapacity,maxWeight,avialableData);
+        tableView.setEditable(true);
+        model.setCellFactory(TextFieldTableCell.forTableColumn());
+        
+        body.setContent(tableView);
+
     
+    }
     @FXML
     void aboutAction(ActionEvent event) throws IOException {
         FXMLLoader loader=new FXMLLoader();
@@ -95,31 +116,10 @@ public class LendingCompanyFXMLController implements Initializable{
     @FXML
     
     void bookingConfirmationA(ActionEvent event) {
-        TableView<Helicopter> tableView=new TableView();;
-        TableColumn<Helicopter, String> model= new TableColumn<>("Model");
-        TableColumn<Helicopter,String> passengerCapacity = new TableColumn<>("Passanger Capacity");;
-        TableColumn<Helicopter,String> maxWeight= new TableColumn<>("Maximum Weight");;
-        TableColumn<Helicopter, LocalDate> avialableData= new TableColumn<>("Avaiable Date");;
-        
-        
-        //set up the columns in the table
-        model.setCellValueFactory(new PropertyValueFactory<>("model"));
-        passengerCapacity.setCellValueFactory(new PropertyValueFactory<>("maxPassCap"));
-        maxWeight.setCellValueFactory(new PropertyValueFactory<>("maxWeight"));
-        avialableData.setCellValueFactory(new PropertyValueFactory<>("availableDate"));
-        lc=(LendingCompany) Data.user;
-        ObservableList<Helicopter> ol=FXCollections.observableArrayList(lc.helicopteList);
-        tableView.setItems(ol);
-        tableView.getColumns().addAll(model,passengerCapacity,maxWeight,avialableData);
-        tableView.setEditable(true);
-        model.setCellFactory(TextFieldTableCell.forTableColumn());
-        body.setContent(tableView);
+       
            
     }
-    @FXML
-    void changeFlightSchAction(ActionEvent event) {
-
-    }
+    
 
     @FXML
     void goHomeAction(ActionEvent event) throws IOException {
@@ -149,12 +149,18 @@ public class LendingCompanyFXMLController implements Initializable{
 
     @FXML
     void viewDelHelicopterAction(ActionEvent event) {
+       helicopInfoTable();
 
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setUser();
+    }
+
+    @FXML
+    private void modifyHelicop(ActionEvent event) {
+        helicopInfoTable();
     }
     
 

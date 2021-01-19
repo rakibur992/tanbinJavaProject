@@ -48,7 +48,7 @@
                   <Insets bottom="10.0" />
                </VBox.margin>
             </Button>
-            <Button fx:id="modifyHelicopter" depthTest="ENABLE" mnemonicParsing="false" onAction="#changeFlightSchAction" prefHeight="29.0" prefWidth="265.0" style="-fx-background-color: #E02840;" text="Modify Helicopter Information" textFill="WHITE">
+            <Button fx:id="modifyHelicopter" depthTest="ENABLE" mnemonicParsing="false" onAction="#modifyHelicop" prefHeight="29.0" prefWidth="265.0" style="-fx-background-color: #E02840;" text="Modify Helicopter Information" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font>

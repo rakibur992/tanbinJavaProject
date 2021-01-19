@@ -10,7 +10,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.time.LocalDate;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
@@ -18,6 +20,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -31,7 +34,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-public class ClientFXMLController {
+public class ClientFXMLController implements Initializable{
 
     @FXML
     private Menu home;
@@ -81,9 +84,7 @@ public class ClientFXMLController {
         TableColumn<Booking,String> desLoc= new TableColumn<>("Destination Location");
         TableColumn<Booking,String> time= new TableColumn<>("Time");
         TableColumn<Booking, LocalDate> pickUpData= new TableColumn<>("Pick-UP Date");
-        TableColumn<Booking,String> status= new TableColumn<>("Status");
-        
-        
+        TableColumn<Booking,String> status= new TableColumn<>("Status"); 
         //set up the columns in the table
         model.setCellValueFactory(new PropertyValueFactory<>("model"));
         pickUpLoc.setCellValueFactory(new PropertyValueFactory<>("pickUpLoc"));
@@ -137,6 +138,15 @@ public class ClientFXMLController {
         window.setTitle("Aviation LogIn");
         window.show();
 
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        setClient();
+    }
+
+    private void setClient() {
+        cl=(Client) Data.user;
     }
 
 }

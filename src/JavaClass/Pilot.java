@@ -9,6 +9,10 @@ package JavaClass;
  *
  * @author Rakib
  */
-public class Pilot {
+public class Pilot extends User{
+    
+    public Pilot(String name, String userName, String pass, String email, String type) {
+        super(name, userName, pass, email, type);
+    }
     
 }
