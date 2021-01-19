@@ -8,13 +8,16 @@ package LendingCompany;
 import JavaClass.LendingCompany;
 import JavaClass.Data;
 import JavaClass.User;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -53,12 +56,19 @@ public class AddHelicopterFXMLController implements Initializable {
     }    
 
     @FXML
-    private void addBtn(ActionEvent event) {
+    private void addBtn(ActionEvent event) throws IOException {
 //        String hdata=hModel.getText()+","+maxPassaengerCapacity.getText()+","+maxWeight.getText()+","+availableDate.getValue().toString()+","+totalDistance.getText();
         LendingCompany lc =(LendingCompany)Data.user;
         lc.addHelicopter(hModel.getText(), maxPassaengerCapacity.getText(), maxWeight.getText(), availableDate.getValue());
         Data.user=lc;
-        System.out.println(availableDate.getValue());
+        
+        File file = new File("helicopter.txt");
+        FileWriter fw= new FileWriter(file,true);
+        PrintWriter pw=new PrintWriter(fw);
+        String data=hModel.getText()+","+maxPassaengerCapacity.getText()+","+maxWeight.getText()+","+ availableDate.getValue();
+        pw.println(data);
+        pw.close();
+      
        
         
         

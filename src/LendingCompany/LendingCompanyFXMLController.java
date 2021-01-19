@@ -139,11 +139,6 @@ public class LendingCompanyFXMLController implements Initializable{
         } catch (IOException ex) {
             Logger.getLogger(AddHelicopterFXMLController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-        
-        
-        
         Parent logIn = FXMLLoader.load(getClass().getResource("/aviationcompany/LogInFXML.fxml"));
         Scene logInScene = new Scene(logIn);
         Stage window = (Stage) body.getScene().getWindow();

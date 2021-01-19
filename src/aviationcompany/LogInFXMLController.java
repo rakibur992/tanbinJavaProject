@@ -6,6 +6,7 @@
 package aviationcompany;
 
 import JavaClass.Admin;
+import JavaClass.Client;
 import JavaClass.LendingCompany;
 import JavaClass.Data;
 import JavaClass.User;
@@ -97,6 +98,10 @@ public class LogInFXMLController implements Initializable {
                             break;
                         }
                         case "client": {
+                            Client user = new Client(dataArr[0], dataArr[1], dataArr[2], dataArr[3], dataArr[4]);
+                            ObjectOutputStream os =new ObjectOutputStream(new FileOutputStream(dataArr[1]+".bin"));
+                            os.writeObject(user);
+                            Data.user=user;
 
                             break;
                         }
