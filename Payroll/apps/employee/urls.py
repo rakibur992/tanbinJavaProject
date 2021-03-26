@@ -6,17 +6,17 @@ from . import views
 urlpatterns = [
     # TemplateView.as_view(template_name="index.html")
     path('<str:company>', views.EmployeeListView.as_view(), name='employee-list'),
-    path('export', views.ExportPayslipToXlxs.as_view(), name='ExportPayslipToXlxs'),
-    path('export/<str:index>', views.EmployExportPayslipToXlxs.as_view(), name='EmpolyExportPayslipToXlxs'),
-#     path('employee/payslip',views.employeePayslip,name='employeePayslip'),
+    path('export', views.ExportPayslipToXlxs.as_view(),
+         name='ExportPayslipToXlxs'),
+    path('export/<str:index>', views.EmployExportPayslipToXlxs.as_view(),
+         name='EmpolyExportPayslipToXlxs'),
+    #     path('employee/payslip',views.employeePayslip,name='employeePayslip'),
     path('employee/<str:pk>', views.EmployeeDetailView.as_view(),
          name='employee-detail'),
     path('', views.EmployeeView.as_view(),
          name='employee'),
+    path('generateEmployeePayroll/<str:email>', views.GenerateEmployeePayroll.as_view(),
+         name='GenerateEmployeePayroll')
 
-#     path('salary-package/<str:pk>', views.SalaryPackageView.as_view(),
-#          name='employee-salary-contract'),
-#     path('payroll/', views.PayrollListView.as_view(),
-#          name='payroll'),
-     
+
 ]

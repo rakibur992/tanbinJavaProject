@@ -4,6 +4,10 @@
     background-color: #417690;
 
 }
+.baseContainer{
+    margin-top: 20px;
+    padding: 50px;
+}
 #navbar p{
     font-size: 30px;
     color: #dac375;

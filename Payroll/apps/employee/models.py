@@ -412,11 +412,11 @@ class Payroll(BaseModel):
         _investment_credit = InvestmentCredit.objects.all().order_by("id")
         _investment_rebate = InvestmentRebateRule.objects.all().order_by("id")
 
-        try:
-            _employee_actual_investment = EmployeeInvestment.objects.filter(
-                employee=_employee_id).order_by("-id").first().yearly_investment_amount
-        except EmployeeInvestment.DoesNotExist:
-            _employee_actual_investment = 10000000.0
+        # try:
+        #     _employee_actual_investment = EmployeeInvestment.objects.filter(
+        #         employee=_employee_id).order_by("-id").first().yearly_investment_amount
+        # except EmployeeInvestment.DoesNotExist:
+        #     _employee_actual_investment = 10000000.0
         _employee_actual_investment = 10000000.0
         # houserent exempt
         self.house_rent_basic_pay_50 = (_salary_package.basic *
@@ -458,7 +458,7 @@ class Payroll(BaseModel):
             _base_step = self.yearly_taxable_income - _max_limit
             print(_base_step)
             self._tax_deduct(_base_step)
-
+        # this funtion returns self.yearlytax without invesment
         else:
             self.tax_1 = self.tax_2 = self.tax_3 = self.tax_4 = self.tax = 0
             self.yearly_tax_without_investment = 5000

@@ -2,39 +2,33 @@
 {% load i18n %}
 
 {% block content %}
-    <h3>{% trans "View Employee" %}</h3>
-    {% comment %} <a class="btn btn-primary" >Download All Payslip</a> {% endcomment %}
-    <a class="btn btn-primary" id="mbtn" href="{%url 'ExportPayslipToXlxs'%}">Download All Payslip</a>
-    {% comment %} <a class="btn btn-primary" href="{%url 'employeePayslip'%}">Download All Payslip</a> {% endcomment %}
+<h3> All Employees of {{employee_list_data.company}} </h3>
+<table class="table">
+  <thead>
+    <tr class="table-primary">
+      <th scope="col">SN#</th>
+      <th scope="col">Employee Name</th>
+      <th scope="col">Employee Email</th>
+      <th scope="col">Employee Joining Date</th>
+      <th scope="col">Download Payslip</th>
+    </tr>
+  </thead>
+  <tbody>
 
-  {% if employee_list %}
-    <table class="table">
-      <thead>
-        <tr class="table-primary">
-          <th scope="col">SN#</th>
-          <th scope="col">Employee Name</th>
-          <th scope="col">Employee Name</th>
-          <th scope="col">Employee Joining Date</th>
-          <th scope="col">Download Payslip</th>
-        </tr>
-      </thead>
-      <tbody>
-    
-      {% for employee in employee_list %}
-      
-      <tr>
-          <th scope="row">{{ forloop.counter }}</th>
-          <td> <a href= "{% url 'employee-detail' employee.official_email %}">{{employee.name}}  </a></td>
-          <td>{{employee.official_email}}</td>
-          <td>{{employee.joining_date}}</td>
-          <td><a class="btn btn-primary" href="{%url 'EmpolyExportPayslipToXlxs' employee.official_email  %}">Download All Payslip</a></td>
-        </tr>
-              {% comment %} <a href= "{% url 'employee-detail' employee.official_email %}">{{ employee.official_email }}</a> ({{employee.official_email}}) {% endcomment %}
-            <!-- <a href="{{ employee.get_absolute_url }}">{{ employee.user.email }}</a> ({{employee.official_email}}) -->
-      {% endfor %}
-      </tbody>
-     </table>
-  {% else %}
-    <p>There are no employee in the Company.</p>
-  {% endif %}       
+    {% if employee_list_data %}
+    {% for employee in employee_list_data.Employee_list %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td> <a href="{% url 'employee-detail' employee.official_email %}">{{employee.name}} </a></td>
+      <td>{{employee.official_email}}</td>
+      <td>{{employee.joining_date}}</td>
+      <td><a class="btn btn-primary" href="{%url 'GenerateEmployeePayroll' employee.official_email %}">Generate Payslip</a></td>
+      {% comment %} <td><a class="btn btn-primary" href="{%url 'EmpolyExportPayslipToXlxs' forloop.counter  %}">Generate Payslip</a></td> {% endcomment %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>There are no employee in the Company.</p>
+{% endif %}
 {% endblock %}

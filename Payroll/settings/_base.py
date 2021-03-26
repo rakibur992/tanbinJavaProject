@@ -73,7 +73,10 @@ INSTALLED_APPS = [
     'Payroll.apps.user',
     'Payroll.apps.employee',
     'Payroll.apps.core',
-    'Payroll.apps.company'
+    'Payroll.apps.company',
+    'bootstrap_datepicker_plus',
+    'django_forms_bootstrap',
+    'bootstrap4'
 ]
 
 MIDDLEWARE = [
@@ -104,7 +107,9 @@ TEMPLATES = [
         },
     },
 ]
-
+BOOTSTRAP4 = {
+    'include_jquery': True,
+}
 WSGI_APPLICATION = 'Payroll.wsgi.application'
 
 

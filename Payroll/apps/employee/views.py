@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.template.context_processors import request
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
+from django.views.generic import FormView
 import csv
 import io
 from time import  strftime
@@ -18,16 +19,30 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from .forms import PayrollGenerator
+
 # Create your views here.
+class GenerateEmployeePayroll(FormView):
+    template_name= "employee/payroll-generator.html"
+    form_class=PayrollGenerator
+    success_url= "GenerateEmployeePayroll"
+    
+    def form_valid(self, form) :
+        form.save()
+        return super().form_valid(form)
+
 
 
 class EmployeeListView(LoginRequiredMixin,ListView):
     model = Employee
     template_name = "employee/employee-list.html"
-    context_object_name = 'employee_list'
+    context_object_name = 'employee_list_data'
 
     def get_queryset(self,**kwargs):
-        object_list = Employee.objects.all().filter(company=self.kwargs.get('company'))
+        object_list={}
+        object_list["company"]=self.kwargs.get('company')
+        object_list["Employee_list"] = Employee.objects.all().filter(company=self.kwargs.get('company'))
+        
         return object_list
   
 class EmployeeView(LoginRequiredMixin,DetailView):
@@ -49,7 +64,7 @@ class EmployeeDetailView(LoginRequiredMixin,DetailView):
     def get(self, request, *args, **kwargs):
         employee = get_object_or_404(Employee, pk=kwargs['pk'])
        
-        context = {'employee': employee, }
+        context = {'employee': employee}
         return render(request, 'employee/employee-detail.html', context)
 
 class EmployExportPayslipToXlxs(LoginRequiredMixin,View):
