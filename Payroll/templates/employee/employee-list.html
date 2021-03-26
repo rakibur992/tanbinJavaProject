@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h3>{% trans "View Employee" %}</h3>
+    {% comment %} <a class="btn btn-primary" >Download All Payslip</a> {% endcomment %}
+    <a class="btn btn-primary" id="mbtn" href="{%url 'ExportPayslipToXlxs'%}">Download All Payslip</a>
+    {% comment %} <a class="btn btn-primary" href="{%url 'employeePayslip'%}">Download All Payslip</a> {% endcomment %}
+
+  {% if employee_list %}
+    <table class="table">
+      <thead>
+        <tr class="table-primary">
+          <th scope="col">SN#</th>
+          <th scope="col">Employee Name</th>
+          <th scope="col">Employee Name</th>
+          <th scope="col">Employee Joining Date</th>
+          <th scope="col">Download Payslip</th>
+        </tr>
+      </thead>
+      <tbody>
+    
+      {% for employee in employee_list %}
+      
+      <tr>
+          <th scope="row">{{ forloop.counter }}</th>
+          <td> <a href= "{% url 'employee-detail' employee.official_email %}">{{employee.name}}  </a></td>
+          <td>{{employee.official_email}}</td>
+          <td>{{employee.joining_date}}</td>
+          <td><a class="btn btn-primary" href="{%url 'EmpolyExportPayslipToXlxs' employee.official_email  %}">Download All Payslip</a></td>
+        </tr>
+              {% comment %} <a href= "{% url 'employee-detail' employee.official_email %}">{{ employee.official_email }}</a> ({{employee.official_email}}) {% endcomment %}
+            <!-- <a href="{{ employee.get_absolute_url }}">{{ employee.user.email }}</a> ({{employee.official_email}}) -->
+      {% endfor %}
+      </tbody>
+     </table>
+  {% else %}
+    <p>There are no employee in the Company.</p>
+  {% endif %}       
+{% endblock %}

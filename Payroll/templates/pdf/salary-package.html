@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+    
+    <h1> "Dear {{Name}}"</h1>
+    <p>Welcome to <strong> Apple </strong></p>
+    <p> your Gross Monthly salary is {{gross_monthly_salary }} with basic salary of {{Basic}} taka</p>
+    <p> your joining date is {{Joining_Date}}</p>
+
+
+
+
+  {% if employee %}
+      <h1>  Hello,  {{employee.user.first_name}}</h1>
+      <h2><strong>Company: </strong> <a href="">{{ employee.company.name }}</a></h2>
+
+  <p><strong>Full Name: </strong>{{ employee.user.first_name }} {{ employee.user.last_name }}</p> 
+  <p><strong>Joining Date: </strong> {{ employee.joining_date }}</p>
+  <p><strong>Official Email: </strong> {{ employee.official_email }}</p> 
+  <p><strong>Tax Type(Person): </strong> {{ employee.tax_payer_type }}</p>  
+  <!-- <p><strong>ddd Date:</strong> {{ salary.basic }}</p>  
+  {% if employee_contract %}
+  <p><strong>Contract Date:</strong> {{ employee_contract.id }}</p>   -->
+
+  {% else %}
+  <p><strong>Contract Date:</strong> ttt </p>  
+  {% endif %} 
+
+  {% else %}
+    <p>Welcome on board</p>
+  {% endif %}       
+{% endblock %}

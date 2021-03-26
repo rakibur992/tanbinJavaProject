@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load mathfilters %}
+
+{% block content %}
+
+<style>
+    #payroll table {
+      width: 1000px;
+      border: none;
+      border-top: 1px solid #EEEEEE;
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+    }
+
+    td,
+    th {
+      border: 1px solid #EEEEEE;
+      border-top: none;
+      text-align: left;
+      padding: 8px;
+      color: #363D41;
+      font-size: 14px;
+    }
+
+    tr {
+      background-color: #fff;
+      border: none;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: repeat(13, 1fr);
+      justify-content: flex-start;
+    }
+
+    tr:first-child:hover {
+      cursor: default;
+      background-color: #fff;
+    }
+
+    tr:hover {
+      background-color: #EEF4FD;
+    }
+    #tax-calc{
+      background-color: rgb(216, 209, 203);
+      align-content: center;
+    }
+    .tb {
+        margin:10px 0;
+    }
+    .tb span+span, .collapsible {
+        display:none;
+    }
+    .tb input[type="checkbox"]:checked ~ span {
+        display:none;
+    }
+    .tb input[type="checkbox"]:checked ~ span+span{
+        display:inline;
+    }
+    .tb input[type="checkbox"]:checked ~ .collapsible {
+        display:table;
+    }
+    #report { border-collapse:collapse;}
+        #report h4 { margin:0px; padding:0px;}
+        /* #report img { float:right;} */
+        #report ul { margin:10px 0 10px 40px; padding:0px;}
+        #report th { background:#7CB8E2 url(header_bkg.png) repeat-x scroll center left; color:#fff; padding:7px 15px; text-align:left;}
+        #report td { background:#C7DDEE none repeat-x scroll center left; color:#000; padding:7px 15px; }
+        #report tr.odd td { background:#52edc7; cursor:pointer; }
+        #report div.arrow { background:transparent url(arrows.png) no-repeat scroll 0px -16px; width:16px; height:16px; display:block;}
+        #report div.up { background-position:0px 0px;}
+</style>
+<section id="payroll_table">
+  {% if payroll_list %}
+  <table id="payroll">
+      <tr>
+          <th>Name</th>
+          <th>Joining Date</th>
+          <!-- <th>Position</th> -->
+          <!-- <th>Joining Date</th> -->
+          <th>Basic Salary</th>
+          <th>Housing Allowance</th>
+          <th>Transport Allowance</th>
+          <th>Medical Allowance</th>
+          <th>Mobile Bill</th>
+          <th>Bonus </th>
+          <th>Providend Fund </th>
+          <th>Before-tax Gross Salary Paymentt</th>
+          <th>Tax This Month</th>
+          <th>Net Monthly Take away</th>
+      </tr>
+      
+      {% for payroll in payroll_list %}
+      <tr >
+          <td> {{ payroll.salary_package.employee.name }} </td>
+          <td> {{payroll.salary_package.employee.joining_date}} </td>
+          <td> {{ payroll.basic }} </td>
+          <td> {{ payroll.house_rent }} </td>
+
+          <td> {{ payroll.conveyance }} </td>
+          <td> {{ payroll.medical }} </td>
+          <td> {{ payroll.mobile }} </td>
+          <td> {{ payroll.bonus }} </td>
+          <td> {{ payroll.providend_fund }} </td>
+          <td> {{ payroll.gross_salary_this_month }} </td>
+          <td> {{ payroll.tax_this_month_with_rebate }} </td>
+          <td> {{ payroll.net_salary_this_month }} </td>
+
+
+      </tr>
+      <tr>
+          <td colspan="5">
+
+                <h5>Salary Package</h5>
+                <table>
+                  <tr>
+                    <th>Salary Structure</th>
+                    <th>Monthly</th>
+                    <th>Annually</th>
+                  </tr>
+                  <tr>
+                      <td>Basic</td>
+                      <td>{{ payroll.salary_package.basic}}</td>
+                      <td>{{ payroll.salary_package.basic | mul:payroll.salary_package.salary_this_year }} </td>
+                  </tr>
+                  <tr>
+                      <td>House Rent</td>
+                      <td>{{ payroll.salary_package.house_rent}}</td>
+                      <td>{{ payroll.salary_package.house_rent | mul:payroll.salary_package.salary_this_year }} </td>
+                  </tr>
+                  <tr>
+                      <td>Transport Allowance</td>
+                      <td>{{ payroll.salary_package.conveyance}}</td>
+                      <td>{{ payroll.salary_package.conveyance | mul:payroll.salary_package.salary_this_year }} </td>
+                  </tr>
+                  <tr>
+                      <td>Medical</td>
+                      <td>{{ payroll.salary_package.medical_bill}}</td>
+                      <td>{{ payroll.salary_package.medical_bill | mul:payroll.salary_package.salary_this_year }} </td>
+                  </tr>
+                  <tr>
+                      <td>Mobile Bill</td>
+                      <td>{{ payroll.salary_package.mobile_bill}}</td>
+                      <td>{{ payroll.salary_package.mobile_bill | mul:payroll.salary_package.salary_this_year }} </td>
+                  </tr>
+                  
+                  <tr>
+                      <td>Gross Salary</td>
+                      <td>{{ payroll.salary_package.gross_monthly_salary}}</td>
+                      <td>{{ payroll.salary_package.gross_yearly_salary }} </td>
+                  </tr>
+                  <tr>
+                      <td>Bonus</td>
+                      <td></td>
+                      <td>{{payroll.salary_package.bonus}}</td>
+                  </tr>
+                  <tr>
+                      <td>Total Salary Income</td>
+                      <td></td>
+                      <td>{{payroll.salary_package.total_salary_income}}</td>
+                  </tr>
+                </table>
+                <br>
+                <h5>Salary Tax Calculation</h5>
+                <h6>  Less: Exemption As per ITO 1984 </h6>
+                <table>
+                    <tr>
+                      <th>House Rent</th>
+                      <th>Calculation</th>
+                      <th>Tax Exempt Amount</th>
+                    </tr>
+                    <tr>
+                        <td> 50% of Basic Pay  </td>
+                        <td>{{ payroll.house_rent_basic_pay_50 }}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>or actual as per salary</td>
+                        <td>{{ payroll.house_rent_as_per_salary }}</td>
+                        <td>{{ payroll.house_rent_exempt }}</td>
+                    </tr>
+                    <tr>
+                        <td> or Upper Limit</td>
+                        <td>{{ payroll.house_rent_band }}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th><strong>Conveyance</strong></th>
+                        <th></th>
+                        <th></th>
+                      </tr>
+                    <tr>
+                        <td> Up tp 30,000 per year</td>
+                        <td>{{ payroll.conveyance_band }}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td> Or actual</td>
+                        <td>{{ payroll.conveyance_as_per_salary }}</td>
+                        <td>{{ payroll.conveyance_exempt }}</td>
+                    </tr>
+                    <tr>
+                        <th><strong>Medical</strong></th>
+                        <th></th>
+                        <th></th>
+                      </tr>
+                    <tr>
+                        <td> 10% of Basic</td>
+                        <td>{{ payroll.medical_basic_pay_10 }}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Or actual as per salary</td>
+                        <td>{{ payroll.medical_as_per_salary }}</td>
+                        <td>{{ payroll.medical_exempt }}</td>
+                    </tr>
+                    <tr>
+                        <td>Or Upper limit</td>
+                        <td>{{ payroll.medical_band }}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                      <td> Taxable Income</td>
+                      <td></td>  
+                      <td> <strong>  {{ payroll.yearly_taxable_income}} </strong></td>
+                      
+                    </tr>
+                    
+                </table>
+                <h5> Tax calculation Without Investment </h5>
+                <table>
+                  <tr>
+                    <th> </th>
+                    <th>Band</th>
+                    <th>Amount</th>
+                  </tr>
+                  <tr>
+                      <td>On 1st Nil </td>
+                      <td>300000</td>
+                      <td>-</td>
+                  </tr>
+                  <tr>
+                      <td> Next upto 100,000@5% </td>
+                      <td>100000</td>
+                      <td>{{ payroll.tax_1}}</td>
+                  </tr>
+                  <tr>
+                      <td> Next upto 300,000@10% </td>
+                      <td>3,00,000</td>
+                      <td>{{ payroll.tax_2}}</td>
+                  </tr>
+                  <tr>
+                      <td> Next upto 400,000@15% </td>
+                      <td>4,00,000</td>
+                      <td>{{ payroll.tax_3}}</td>
+                  </tr>
+                  <tr>
+                      <td> Next upto 500,000@20% </td>
+                      <td>5,00,000</td>
+                      <td>{{ payroll.tax_4}}</td>
+                  </tr>
+                  
+                  <tr>
+                      <td> On the Balance @25% </td>
+                      <td> Rest Amount </td>
+                      <td>{{ payroll.tax_5}}</td>
+                  </tr>
+                  <tr>
+                      <td><strong> Total Annual Tax Without Investment </strong></td>
+                      <td></td>
+                      <td>  {{ payroll.yearly_tax_without_investment}} </td>
+                  </tr>
+                  
+                </table>
+                <h5> Tax calculation With Investment </h5>
+                <table>
+                  <tr>
+                    <th>Sector</th>
+                    <th></th>
+                  </tr>
+                  <tr>
+                      <td>25% of the Total Taxable Income</td>
+                      <td></td>
+                  </tr>
+                  <tr>
+                      <td>or Tk. 15,000,000/-  </td>
+                      <td> {{ payroll.investment_credit}}</td>
+                  </tr>
+                  <tr>
+                      <td>or actual investment </td>
+                      <td>0</td>
+                  </tr>
+                  <tr>
+                      <td>Investment Credit</td>
+                      <td> {{ payroll.investment_credit}}</td>
+                  </tr>
+                  <tr>
+                      <td>Investment Rebate</td>
+                      <td>  {{ payroll.investment_rebate}} </td>
+                  </tr>
+                  <tr>
+                      <td>
+                        <strong> Total Annual Tax With Investment Rebate </strong> 
+                      </td>
+                      <td>   {{ payroll.yearly_tax_with_investment_rebate}}  </td>
+                  </tr>
+                  <tr>
+                      <td>
+                        <strong> Tax this Month </strong> 
+                      </td>
+                      <td> {{ payroll.tax_this_month_with_rebate}} </td>
+                  </tr>
+
+                </table>
+                <br><br>
+                <button> Print</button>
+                <button> Email</button>
+          </td>
+      </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>There are no employee in this Company.</p>
+  {% endif %}    
+  
+</section>
+
+<script>
+ 
+        $(document).ready(function(){
+            $("#report tr:odd").addClass("odd");
+            $("#report tr:not(.odd)").hide();
+            $("#report tr:first-child").show();
+            
+            $("#report tr.odd").click(function(){
+                $(this).next("tr").toggle();
+                $(this).find(".arrow").toggleClass("up");
+            });
+        });
+</script>
+{% endblock %}
+

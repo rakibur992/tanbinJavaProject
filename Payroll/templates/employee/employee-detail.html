@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+    
+
+
+  {% if employee %}
+      <h1>  Hello,  {{employee.user.first_name}}</h1>
+      <h2><strong>Company: </strong> <a href="">{{ employee.company.name }}</a></h2>
+
+  <p><strong>Full Name: </strong>{{ employee.user.first_name }} {{ employee.user.last_name }}</p> 
+  <p><strong>Joining Date: </strong> {{ employee.joining_date }}</p>
+  <p><strong>Official Email: </strong> {{ employee.official_email }}</p> 
+  <p><strong>Tax Type(Person): </strong> {{ employee.tax_payer_type }}</p>  
+
+
+  <a href= "{% url 'employee-salary-contract' employee.official_email %}">Contract Paper</a> 
+  <!-- <p><strong>ddd Date:</strong> {{ salary.basic }}</p>  
+  {% if employee_contract %}
+  <p><strong>Contract Date:</strong> {{ employee_contract.id }}</p>   -->
+
+  {% else %}
+  <p><strong>Contract Date:</strong> ttt </p>  
+  {% endif %} 
+
+  {% else %}
+    <p>There are no details.</p>
+  {% endif %}       
+{% endblock %}

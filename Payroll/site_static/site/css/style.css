@@ -1,0 +1,16 @@
+#navbar{
+    width: 100%;
+    height: 50px;
+    background-color: #417690;
+
+}
+#navbar p{
+    font-size: 30px;
+    color: #dac375;
+    margin-left: 30px;
+
+}
+#mbtn{
+    border-radius: 20px; 
+    margin: 20px;
+}

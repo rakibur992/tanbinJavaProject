@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h3>{% trans "View Companies" %}</h3>
+    {% comment %} <a class="btn btn-primary" >Download All Payslip</a> {% endcomment %}
+    {% comment %} <a class="btn btn-primary" href="{%url 'ExportPayslipToXlxs'%}">Download All Payslip</a> {% endcomment %}
+    {% comment %} <a class="btn btn-primary" href="{%url 'employeePayslip'%}">Download All Payslip</a> {% endcomment %}
+
+  {% if company_list %}
+    <table class="table">
+      <thead>
+        <tr class="table-primary">
+          <th scope="col">SN#</th>
+          <th scope="col">Company Name</th>
+          <th scope="col">Company Adress</th>
+          <th scope="col">Contact Person</th>
+        </tr>
+      </thead>
+      <tbody>
+    
+      {% for company in company_list %}
+      
+      <tr>
+          <th scope="row">{{ forloop.counter }} </th>
+          <td> <a href="{% url 'employee-list' company.name %}">{{company.name}}</a>  </td>
+          <td>{{company.address}}</td>
+          <td>{{company.contact_person}}</td>
+        </tr>
+              {% comment %} <a href= "{% url 'employee-detail' employee.official_email %}">{{ employee.official_email }}</a> ({{employee.official_email}}) {% endcomment %}
+            <!-- <a href="{{ employee.get_absolute_url }}">{{ employee.user.email }}</a> ({{employee.official_email}}) -->
+      {% endfor %}
+      </tbody>
+     </table>
+  {% else %}
+    <p>There are no employee in the Company.</p>
+  {% endif %}       
+{% endblock %}
