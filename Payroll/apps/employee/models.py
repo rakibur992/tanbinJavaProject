@@ -239,7 +239,8 @@ class SalaryPackage(BaseModel):
     comment = models.CharField(max_length=100, blank=True)
     salary_this_year = models.FloatField(blank=True)
     total_salary_income = models.FloatField(blank=True)
-    tax_paid_this_year= models.FloatField(default=0.0,blank=True)
+    tax_paid_this_year_without_investment= models.FloatField(default=0.0,blank=True)
+    tax_paid_this_year_with_rebate = models.FloatField(default=0.0,blank=True)
     last_increment_date = models.DateField(blank=True)
 
     def __str__(self):
@@ -412,7 +413,7 @@ class Payroll(BaseModel):
         _salary_package.monthly_incentive += self.monthly_incentive 
         self.special_allowence_7 = (_salary_package.basic *0.07) if \
             self.difference_in_months(_employee.joining_date,self.salary_issued_date) > 12 else 0
-        print(_salary_package.difference_in_months(_employee.joining_date,self.salary_issued_date))
+       
         _salary_package.special_allowence_7 += self.special_allowence_7
         _salary_package.save()
         _salary_package = SalaryPackage.objects.filter(
@@ -485,8 +486,11 @@ class Payroll(BaseModel):
             self.tax_1 = self.tax_2 = self.tax_3 = self.tax_4 = self.tax = 0
             self.yearly_tax_without_investment = 5000
 
-        self.tax_this_month_without_investment = round(self.yearly_tax_without_investment /
-                                                       _salary_package.salary_this_year, 2)
+        _tax_month_left = self.difference_in_months(self.salary_issued_date,_financial_year.financial_year_end)+1
+        _tax_need_to_pay_this_year = self.yearly_tax_without_investment  - _salary_package.tax_paid_this_year_without_investment
+
+        self.tax_this_month_without_investment = round(_tax_need_to_pay_this_year/_tax_month_left, 2)
+        _salary_package.tax_paid_this_year_without_investment += self.tax_this_month_without_investment                                               
         self.gross_salary_this_month = _salary_package.gross_monthly_salary
         self.salary_this_month_without_investment = round(self.gross_salary_this_month -
                                                           self.tax_this_month_without_investment, 2)
@@ -508,12 +512,12 @@ class Payroll(BaseModel):
 
         self.yearly_tax_with_investment_rebate = round(self.yearly_tax_without_investment -
                                                        self.investment_rebate, 2)
-        _tax_need_to_pay_this_year = self.yearly_tax_with_investment_rebate - _salary_package.tax_paid_this_year
-        _tax_month_left = self.difference_in_months(self.salary_issued_date,_financial_year.financial_year_end)+1
+        _tax_need_to_pay_this_year_with_rebate = self.yearly_tax_with_investment_rebate - _salary_package.tax_paid_this_year_with_rebate
+       
 
         self.tax_this_month_with_rebate = round(
-            _tax_need_to_pay_this_year  / _tax_month_left, 2)
-        _salary_package.tax_paid_this_year += self.tax_this_month_with_rebate
+            _tax_need_to_pay_this_year_with_rebate  / _tax_month_left, 2)
+        _salary_package.tax_paid_this_year_with_rebate += self.tax_this_month_with_rebate
         _salary_package.save()
         # self.tax_this_month_with_rebate = round(
         #     self.yearly_tax_with_investment_rebate / _salary_package.salary_this_year, 2)
