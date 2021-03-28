@@ -1,2 +1,7 @@
 Payroll/apps/employee/__pycache__/*
 .vscode
+Payroll/apps/employee/migrations/__pycache__/0033_auto_20210327_1703.cpython-38.pyc
+Payroll/apps/employee/models.py
+Payroll/apps/employee/__pycache__/views.cpython-38.pyc
+Payroll/apps/employee/__pycache__/models.cpython-38.pyc
+Payroll/apps/employee/__pycache__/admin.cpython-38.pyc

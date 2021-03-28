@@ -231,13 +231,15 @@ class SalaryPackage(BaseModel):
     providend_fund = models.FloatField(blank=True)
     gratuity = models.FloatField(blank=True)
     bonus = models.FloatField(blank=True)
+    special_allowence_7 = models.FloatField(blank=True,default=0.0)
+    monthly_incentive = models.FloatField(default=0.0,blank=True)
     # investment = models.FloatField(blank=True)
     gross_monthly_salary = models.FloatField(blank=True)
     gross_yearly_salary = models.FloatField(blank=True)
     comment = models.CharField(max_length=100, blank=True)
     salary_this_year = models.FloatField(blank=True)
     total_salary_income = models.FloatField(blank=True)
-
+    tax_paid_this_year= models.FloatField(default=0.0,blank=True)
     last_increment_date = models.DateField(blank=True)
 
     def __str__(self):
@@ -259,7 +261,8 @@ class SalaryPackage(BaseModel):
             self.providend_fund + self.gratuity
         self.gross_yearly_salary = self.gross_monthly_salary * _salaries_this_year
         self.salary_this_year = _salaries_this_year
-        self.total_salary_income = self.gross_yearly_salary + self.bonus
+        
+        self.total_salary_income = self.gross_yearly_salary + self.bonus+self.special_allowence_7+self.monthly_incentive
 
         super(SalaryPackage, self).save(*args, **kwargs)
 
@@ -348,6 +351,8 @@ class Payroll(BaseModel):
 
     mobile = models.FloatField(blank=True, default=0.0)
     bonus = models.FloatField(blank=True, default=0.0)
+    monthly_incentive = models.FloatField(blank=True, default=0.0)
+    special_allowence_7 = models.FloatField(blank=True, default=0.0)
     providend_fund = models.FloatField(blank=True, default=0.0)
 
     gross_salary_this_month = models.FloatField(blank=True, default=0.0)
@@ -385,16 +390,33 @@ class Payroll(BaseModel):
 
     def less_among_three(self, a, b, c):
         return a if a < b and a < c else b if b < c else c
+    def difference_in_months(self, start, end):
+        if start.year == end.year:
+            months = end.month - start.month
+        else:
+            months = (12 - start.month) + (end.month)
+
+        if start.day > end.day:
+            months = months - 1
+        return months
 
     def save(self, *args, **kwargs):
 
         _employee = Employee.objects.get(
             pk=self.employee.official_email)
         _employee_id = self.employee.official_email
+        _financial_year = FinancialYear.objects.get(current_year=True)
 
         _salary_package = SalaryPackage.objects.filter(
             employee=_employee_id).order_by('-id').first()
-
+        _salary_package.monthly_incentive += self.monthly_incentive 
+        self.special_allowence_7 = (_salary_package.basic *0.07) if \
+            self.difference_in_months(_employee.joining_date,self.salary_issued_date) > 12 else 0
+        print(_salary_package.difference_in_months(_employee.joining_date,self.salary_issued_date))
+        _salary_package.special_allowence_7 += self.special_allowence_7
+        _salary_package.save()
+        _salary_package = SalaryPackage.objects.filter(
+            employee=_employee_id).order_by('-id').first()
         self.basic = _salary_package.basic if self.basic < 1 else self.basic
 
         self.house_rent = _salary_package.house_rent if self.house_rent < 1 else self.house_rent
@@ -448,7 +470,7 @@ class Payroll(BaseModel):
             self.medical_basic_pay_10, self.medical_as_per_salary, self.medical_band)
 
         # yearly taxable income
-        self.yearly_taxable_income = _salary_package.total_salary_income - \
+        self.yearly_taxable_income = _salary_package.total_salary_income +self.monthly_incentive - \
             self.house_rent_exempt - self.conveyance_exempt - self.medical_exempt
 
         # yearly tax calculation without investment
@@ -486,9 +508,15 @@ class Payroll(BaseModel):
 
         self.yearly_tax_with_investment_rebate = round(self.yearly_tax_without_investment -
                                                        self.investment_rebate, 2)
+        _tax_need_to_pay_this_year = self.yearly_tax_with_investment_rebate - _salary_package.tax_paid_this_year
+        _tax_month_left = self.difference_in_months(self.salary_issued_date,_financial_year.financial_year_end)+1
 
         self.tax_this_month_with_rebate = round(
-            self.yearly_tax_with_investment_rebate / _salary_package.salary_this_year, 2)
+            _tax_need_to_pay_this_year  / _tax_month_left, 2)
+        _salary_package.tax_paid_this_year += self.tax_this_month_with_rebate
+        _salary_package.save()
+        # self.tax_this_month_with_rebate = round(
+        #     self.yearly_tax_with_investment_rebate / _salary_package.salary_this_year, 2)
 
 
         self.salary_this_month_with_rebate = self.net_salary_this_month = round(self.gross_salary_this_month -

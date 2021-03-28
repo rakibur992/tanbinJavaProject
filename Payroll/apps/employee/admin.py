@@ -44,7 +44,7 @@ class PayrollAdmin(ImportExportModelAdmin):
     list_display = ("employee", "basic", "house_rent", "conveyance", "medical",
                     "mobile", "bonus", "providend_fund", "salary_issued_date")
 
-    fields = ("employee", "salary_issued_date")
+    fields = ("employee","monthly_incentive", "salary_issued_date")
     list_filter = (
         ("salary_issued_date", DateRangeFilter),)
     order = ("id",)

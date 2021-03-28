@@ -25,10 +25,17 @@ from .forms import PayrollGenerator
 class GenerateEmployeePayroll(FormView):
     template_name= "employee/payroll-generator.html"
     form_class=PayrollGenerator
-    success_url= "GenerateEmployeePayroll"
-    
+    success_url='/employee/Fashionlinq'
+   
     def form_valid(self, form) :
-        form.save()
+        email=self.kwargs.get('email')
+        print(email)
+        # Save the validated data of your object
+        self.object = form.save(commit = False)
+         # Update the value of the desired field
+        self.object.employee = Employee.objects.get(pk=email)
+         # Save the object to commit the changes
+        self.object.save()
         return super().form_valid(form)
 
 
