@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-
 from Payroll.apps.core.models import BaseModel
 from Payroll.apps.user.models import User
 from Payroll.apps.company.models import Company
@@ -255,7 +254,7 @@ class SalaryPackage(BaseModel):
             pk=self.employee.official_email)
         _financial_year = FinancialYear.objects.get(current_year=True)
         _salaries_this_year = self.difference_in_months(_employee.joining_date,
-                                                        _financial_year.financial_year_end) + 1
+                                                        _financial_year.financial_year_end)
 
         self.gross_monthly_salary = self.basic + self.house_rent + self.medical_bill + \
             self.conveyance + self.mobile_bill + \
@@ -268,15 +267,9 @@ class SalaryPackage(BaseModel):
         super(SalaryPackage, self).save(*args, **kwargs)
 
     def difference_in_months(self, start, end):
-        if start.year == end.year:
-            months = end.month - start.month
-        else:
-            months = (12 - start.month) + (end.month)
-
-        if start.day > end.day:
-            months = months - 1
+        months=round((end-start).days/30)
         if months > 11:
-            return 11
+            return 12
         return months
 
 
@@ -392,13 +385,8 @@ class Payroll(BaseModel):
     def less_among_three(self, a, b, c):
         return a if a < b and a < c else b if b < c else c
     def difference_in_months(self, start, end):
-        if start.year == end.year:
-            months = end.month - start.month
-        else:
-            months = (12 - start.month) + (end.month)
 
-        if start.day > end.day:
-            months = months - 1
+        months=round((end-start).days/30)
         return months
 
     def save(self, *args, **kwargs):
@@ -412,7 +400,7 @@ class Payroll(BaseModel):
             employee=_employee_id).order_by('-id').first()
         _salary_package.monthly_incentive += self.monthly_incentive 
         self.special_allowence_7 = (_salary_package.basic *0.07) if \
-            self.difference_in_months(_employee.joining_date,self.salary_issued_date) > 12 else 0
+            self.difference_in_months(_employee.joining_date,self.salary_issued_date) > 11 else 0
        
         _salary_package.special_allowence_7 += self.special_allowence_7
         _salary_package.save()
@@ -486,7 +474,7 @@ class Payroll(BaseModel):
             self.tax_1 = self.tax_2 = self.tax_3 = self.tax_4 = self.tax = 0
             self.yearly_tax_without_investment = 5000
 
-        _tax_month_left = self.difference_in_months(self.salary_issued_date,_financial_year.financial_year_end)+1
+        _tax_month_left = self.difference_in_months(self.salary_issued_date,_financial_year.financial_year_end)
         _tax_need_to_pay_this_year = self.yearly_tax_without_investment  - _salary_package.tax_paid_this_year_without_investment
 
         self.tax_this_month_without_investment = round(_tax_need_to_pay_this_year/_tax_month_left, 2)
