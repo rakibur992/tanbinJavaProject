@@ -25,8 +25,10 @@ class EmployeeAdmin(ImportExportModelAdmin):
                    ("joining_date", DateRangeFilter))
 
 
-# admin.site.register(Employee, EmployeeAdmin)
-
+@admin.register(EmployeeTaxAdvencePayment)# admin.site.register(Employee, EmployeeAdmin)
+class EmployeeTaxAdvencePaymentAdmin(ImportExportModelAdmin):
+    pass
+    
 
 @admin.register(SalaryPackage)
 class SalaryPackageAdmin(ImportExportModelAdmin, RelatedFieldAdmin):
@@ -97,3 +99,4 @@ admin.site.register(TaxPayerType)
 admin.site.register(FinancialYear)
 admin.site.register(InvestmentCredit, InvestmentCreditAdmin)
 admin.site.register(InvestmentRebateRule, InvestmentRebateRuleAdmin)
+# admin.site.register(EmployeeTaxAdvencePayment)

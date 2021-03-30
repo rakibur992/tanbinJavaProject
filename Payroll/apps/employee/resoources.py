@@ -15,7 +15,6 @@ class EmployeeAdminResource(resources.ModelResource):
         import_id_fields = ['created_at', 'modified_at', 'official_email',
                             'company', 'name', 'tax_payer_type', 'joining_date']  # Let it had 'id'
 
-
 class PayrollAdminResource(resources.ModelResource):
 
     mobile = Field(attribute='mobile_bill', column_name='mobile')

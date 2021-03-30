@@ -26,7 +26,7 @@
       <tr>
           <th scope="row">{{ forloop.counter }}</th>
           <td>{{payroll.salary_issued_date}}</td>
-          <td><a class="btn btn-primary" href="{%url 'EmpolyExportPayslipToXlxs' forloop.counter %}">Download Payslip</a></td>
+          <td><a class="btn btn-primary" href="{%url 'EmpolyExportPayslipToXlxs' payroll.id %}">Download Payslip</a></td>
         </tr>
               {% comment %} <a href= "{% url 'employee-detail' employee.official_email %}">{{ employee.official_email }}</a> ({{employee.official_email}}) {% endcomment %}
             <!-- <a href="{{ employee.get_absolute_url }}">{{ employee.user.email }}</a> ({{employee.official_email}}) -->

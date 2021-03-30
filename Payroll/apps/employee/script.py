@@ -1,8 +1,6 @@
 from Payroll.apps.employee.models import Payroll,Employee,SalaryPackage,FinancialYear
 import pandas as pd
 from datetime import datetime
-
-# def run():
 df=pd.read_csv('payrollCSV.csv')
 dates=[date for date in df['date'].dropna()]
 # employee={"official_email" :[],"incentive": []}
@@ -16,11 +14,11 @@ for date in dates:
     payroll.save()
 
 # Reset salary Package
-# for email,incentive in zip (df['email'],df['incentive'].fillna(0)):
-#     sp=SalaryPackage.objects.filter(employee=email).order_by('-id').first()
-#     print(sp)
-#     sp.monthly_incentive=0
-#     sp.special_allowence_7=0
-#     sp.tax_paid_this_year_without_investment=0
-#     sp.tax_paid_this_year_with_rebate=0
-#     sp.save()
+for email,incentive in zip (df['email'],df['incentive'].fillna(0)):
+    sp=SalaryPackage.objects.filter(employee=email).order_by('-id').first()
+    print(sp)
+    sp.monthly_incentive=0
+    sp.special_allowence_7=0
+    sp.tax_paid_this_year_without_investment=0
+    sp.tax_paid_this_year_with_rebate=0
+    sp.save()

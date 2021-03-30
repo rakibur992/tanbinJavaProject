@@ -1,4 +1,3 @@
-
 from django.db.models.signals import post_save
 from uuid import uuid4
 
@@ -109,10 +108,19 @@ def save_salary_package(sender, instance, **kwargs):
     financial_year = FinancialYear.objects.get(current_year=True)
     EmployeeInvestment.objects.create(
         employee=instance, financial_year=financial_year, yearly_investment_amount=0)
-
+    EmployeeTaxAdvencePayment.objects.create(employee=instance)
 
 post_save.connect(save_salary_package, sender=Employee)
 
+class EmployeeTaxAdvencePayment(BaseModel):
+    employee = models.ForeignKey(Employee, on_delete=models.PROTECT)
+    advance_tax_paid_last_financial_year=models.FloatField(default=0.0)
+    def __str__(self):
+        return self.employee.name 
+
+    class Meta:
+        verbose_name = "Employee Tax Advence Payment"
+        verbose_name_plural = "Employee Tax Advence Payments"
 
 class EmployeeGrade(BaseModel):
     employee = models.OneToOneField(
@@ -399,7 +407,7 @@ class Payroll(BaseModel):
         _salary_package = SalaryPackage.objects.filter(
             employee=_employee_id).order_by('-id').first()
         _salary_package.monthly_incentive += self.monthly_incentive 
-        self.special_allowence_7 = (_salary_package.basic *0.07) if \
+        self.special_allowence_7 = round((_salary_package.basic *0.07),2) if \
             self.difference_in_months(_employee.joining_date,self.salary_issued_date) > 11 else 0
        
         _salary_package.special_allowence_7 += self.special_allowence_7
@@ -423,12 +431,12 @@ class Payroll(BaseModel):
         _investment_credit = InvestmentCredit.objects.all().order_by("id")
         _investment_rebate = InvestmentRebateRule.objects.all().order_by("id")
 
-        # try:
-        #     _employee_actual_investment = EmployeeInvestment.objects.filter(
-        #         employee=_employee_id).order_by("-id").first().yearly_investment_amount
-        # except EmployeeInvestment.DoesNotExist:
-        #     _employee_actual_investment = 10000000.0
-        _employee_actual_investment = 10000000.0
+        try:
+            _employee_actual_investment = EmployeeInvestment.objects.filter(
+                employee=_employee_id).order_by("-id").first().yearly_investment_amount
+        except EmployeeInvestment.DoesNotExist:
+            _employee_actual_investment = 10000000.0
+        
         # houserent exempt
         self.house_rent_basic_pay_50 = (_salary_package.basic *
                                         _salary_package.salary_this_year) / 2
@@ -459,7 +467,7 @@ class Payroll(BaseModel):
             self.medical_basic_pay_10, self.medical_as_per_salary, self.medical_band)
 
         # yearly taxable income
-        self.yearly_taxable_income = _salary_package.total_salary_income +self.monthly_incentive - \
+        self.yearly_taxable_income = _salary_package.total_salary_income - \
             self.house_rent_exempt - self.conveyance_exempt - self.medical_exempt
 
         # yearly tax calculation without investment
@@ -473,16 +481,16 @@ class Payroll(BaseModel):
         else:
             self.tax_1 = self.tax_2 = self.tax_3 = self.tax_4 = self.tax = 0
             self.yearly_tax_without_investment = 5000
-
+        _advance_tax_paid_last_financial_year = EmployeeTaxAdvencePayment.objects.get(employee=_employee).advance_tax_paid_last_financial_year
         _tax_month_left = self.difference_in_months(self.salary_issued_date,_financial_year.financial_year_end)
-        _tax_need_to_pay_this_year = self.yearly_tax_without_investment  - _salary_package.tax_paid_this_year_without_investment
+        _tax_need_to_pay_this_year = self.yearly_tax_without_investment  - _salary_package.tax_paid_this_year_without_investment - _advance_tax_paid_last_financial_year
 
         self.tax_this_month_without_investment = round(_tax_need_to_pay_this_year/_tax_month_left, 2)
-        _salary_package.tax_paid_this_year_without_investment += self.tax_this_month_without_investment                                               
+        _salary_package.tax_paid_this_year_without_investment += round(self.tax_this_month_without_investment,2)      
+
         self.gross_salary_this_month = _salary_package.gross_monthly_salary
         self.salary_this_month_without_investment = round(self.gross_salary_this_month -
                                                           self.tax_this_month_without_investment, 2)
-
         # yearly tax calculation with investment
         _investment_credit_per_salary = self.yearly_taxable_income / \
             100 * _investment_credit[0].percentage
@@ -496,24 +504,20 @@ class Payroll(BaseModel):
 
         self.investment_rebate = (
             self.investment_credit / 100) * _investment_rebate_percentage
-        
-
+    
         self.yearly_tax_with_investment_rebate = round(self.yearly_tax_without_investment -
                                                        self.investment_rebate, 2)
-        _tax_need_to_pay_this_year_with_rebate = self.yearly_tax_with_investment_rebate - _salary_package.tax_paid_this_year_with_rebate
-       
+        _tax_need_to_pay_this_year_with_rebate = self.yearly_tax_with_investment_rebate - _salary_package.tax_paid_this_year_with_rebate -_advance_tax_paid_last_financial_year
+    
 
         self.tax_this_month_with_rebate = round(
             _tax_need_to_pay_this_year_with_rebate  / _tax_month_left, 2)
-        _salary_package.tax_paid_this_year_with_rebate += self.tax_this_month_with_rebate
+        _salary_package.tax_paid_this_year_with_rebate += round(self.tax_this_month_with_rebate)
         _salary_package.save()
         # self.tax_this_month_with_rebate = round(
         #     self.yearly_tax_with_investment_rebate / _salary_package.salary_this_year, 2)
-
-
         self.salary_this_month_with_rebate = self.net_salary_this_month = round(self.gross_salary_this_month -
                                                                                 self.tax_this_month_with_rebate, 2)
-
         super(Payroll, self).save(*args, **kwargs)
 
     def _tax_deduct(self, _base_step):
@@ -567,9 +571,7 @@ class Payroll(BaseModel):
 
         _tax = (_tax_bracket / 100) * _tax_percentage
 
-        print(_money, _tax)
         return _money, _tax
-
     def _tax_rule(self, rule_number):
         _tax_rule = TaxRule.objects.all().order_by("id")
         return _tax_rule[rule_number].TAX_RULE_CHOICES[_tax_rule[rule_number].tax_percentage-1][1], _tax_rule[rule_number].tax_bracket

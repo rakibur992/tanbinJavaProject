@@ -26,7 +26,7 @@ class GenerateEmployeePayroll(FormView):
     template_name= "employee/payroll-generator.html"
     form_class=PayrollGenerator
     success_url='/employee/Fashionlinq'
-   
+
     def form_valid(self, form) :
         email=self.kwargs.get('email')
         print(email)
@@ -37,6 +37,20 @@ class GenerateEmployeePayroll(FormView):
          # Save the object to commit the changes
         self.object.save()
         return super().form_valid(form)
+    def  get_context_data(self, **kwargs):
+        email=self.kwargs.get('email')
+        employee= Employee.objects.get(official_email=email)
+        context = super().get_context_data(**kwargs)
+        context['employee']=employee
+        return context     
+
+    # def get_queryset(self,**kwargs):
+    #     email=self.kwargs.get('email')
+    #     object_list={}
+    #     object_list["employee"] = Employee.objects.get(official_email=email)
+    #     return object_list
+       
+    
 
 
 
@@ -70,14 +84,33 @@ class EmployeeDetailView(LoginRequiredMixin,DetailView):
     models = Employee
     def get(self, request, *args, **kwargs):
         employee = get_object_or_404(Employee, pk=kwargs['pk'])
-       
-        context = {'employee': employee}
+        payroll_data=Payroll.objects.all().filter(employee=kwargs['pk'])
+        
+        payroll_id=[]
+        for payroll in payroll_data:
+            payroll_id.append(employee.official_email+"_"+str(payroll.id))
+        context = {'employee': employee,
+                    'payroll_data':zip(payroll_data,payroll_id)
+                    }
         return render(request, 'employee/employee-detail.html', context)
 
+class AnyEmployExportPayslipToXlxs(View):
+    def get(self, request,**kwargs):
+        employee_slug=self.kwargs.get('employee_slug')
+        email=employee_slug.split('_')[0]
+        index=employee_slug.split('_')[1]
+        response = getPaySlipRespone(email,index)
+        return response
 class EmployExportPayslipToXlxs(LoginRequiredMixin,View):
 
     def get(self, request,**kwargs):
-         # Create an in-memory output file for the new workbook.
+        email=request.user.username
+        index=int(self.kwargs.get('index'))
+        response = getPaySlipRespone(email,index)
+        return response
+
+def getPaySlipRespone (email,index):
+             # Create an in-memory output file for the new workbook.
         output = io.BytesIO()
 
         # Even though the final file will be in memory the module uses temp
@@ -105,11 +138,9 @@ class EmployExportPayslipToXlxs(LoginRequiredMixin,View):
         worksheet.set_column('A:D',30,border)
         worksheet.set_column('E:E',12,border)
 
-        email=request.user.username
-        index=int(self.kwargs.get('index'))
-        data=Payroll.objects.all().filter(employee=email)[index-1]
-        print(data)
-        employee_data=Employee.objects.all().filter(official_email=email)[0]
+        data=Payroll.objects.get(id=index)
+        
+        employee_data=Employee.objects.get(official_email=email)
         
         company_data=Company.objects.all().filter(name=employee_data.company)[0]
         company_logo=company_data.company_logo
@@ -189,10 +220,8 @@ class EmployExportPayslipToXlxs(LoginRequiredMixin,View):
             output,
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = 'attachment; filename=%s' % filename
+        response['Content-Disposition'] = 'attachment; filename=%s' % filename    
         return response
-
-        
        
 
 class ExportPayslipToXlxs(View):

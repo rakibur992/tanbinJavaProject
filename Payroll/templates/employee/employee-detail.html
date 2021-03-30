@@ -6,25 +6,46 @@
 
 
   {% if employee %}
-      <h1>  Hello,  {{employee.user.first_name}}</h1>
       <h2><strong>Company: </strong> <a href="">{{ employee.company.name }}</a></h2>
 
-  <p><strong>Full Name: </strong>{{ employee.user.first_name }} {{ employee.user.last_name }}</p> 
-  <p><strong>Joining Date: </strong> {{ employee.joining_date }}</p>
-  <p><strong>Official Email: </strong> {{ employee.official_email }}</p> 
-  <p><strong>Tax Type(Person): </strong> {{ employee.tax_payer_type }}</p>  
+    <p><strong>Full Name: </strong>{{ employee.name}}</p> 
+    <p><strong>Joining Date: </strong> {{ employee.joining_date }}</p>
+    <p><strong>Official Email: </strong> {{ employee.official_email }}</p> 
+    <p><strong>Tax Type(Person): </strong> {{ employee.tax_payer_type }}</p>  
+    <a href= "">Contract Paper</a> 
+    <h2>Download PaySlip</h2>
+    <form action="" method="post">
+    <table class="table">
+        <thead>
+          <tr class="table-primary">
+            <th scope="col">SN#</th>
+            <th scope="col">Payroll Issue Date</th>
+            <th scope="col">Download Payslip</th>
+          </tr>
+        </thead>
+        <tbody>
+      
+        {% for payroll , payroll_id in payroll_data %}
+        
+        <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{payroll.salary_issued_date}}</td>
+           
+            <td><a class="btn btn-primary" href="{%url 'AnyEmployExportPayslipToXlxs' payroll_id %}">Download Payslip</a></td>
 
+       
+          </tr>
+                {% comment %} <a href= "{% url 'employee-detail' employee.official_email %}">{{ employee.official_email }}</a> ({{employee.official_email}}) {% endcomment %}
+              <!-- <a href="{{ employee.get_absolute_url }}">{{ employee.user.email }}</a> ({{employee.official_email}}) -->
+        {% endfor %}
+        </tbody>
+      </table>
 
-  <a href= "">Contract Paper</a> 
-  <!-- <p><strong>ddd Date:</strong> {{ salary.basic }}</p>  
-  {% if employee_contract %}
-  <p><strong>Contract Date:</strong> {{ employee_contract.id }}</p>   -->
-
-  {% else %}
-  <p><strong>Contract Date:</strong> ttt </p>  
-  {% endif %} 
-
+    
+    </form>
+    
   {% else %}
     <p>There are no details.</p>
-  {% endif %}       
+  {% endif %}    
+    
 {% endblock %}
