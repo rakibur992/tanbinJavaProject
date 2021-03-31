@@ -240,6 +240,7 @@ class SalaryPackage(BaseModel):
     bonus = models.FloatField(blank=True)
     special_allowence_7 = models.FloatField(blank=True,default=0.0)
     monthly_incentive = models.FloatField(default=0.0,blank=True)
+    performance_bonus_given =  models.FloatField(default=0.0,blank=True)
     # investment = models.FloatField(blank=True)
     gross_monthly_salary = models.FloatField(blank=True)
     gross_yearly_salary = models.FloatField(blank=True)
@@ -270,7 +271,7 @@ class SalaryPackage(BaseModel):
         self.gross_yearly_salary = self.gross_monthly_salary * _salaries_this_year
         self.salary_this_year = _salaries_this_year
         
-        self.total_salary_income = self.gross_yearly_salary + self.bonus+self.special_allowence_7+self.monthly_incentive
+        self.total_salary_income = self.gross_yearly_salary + self.bonus+self.special_allowence_7+self.monthly_incentive+self.performance_bonus_given
 
         super(SalaryPackage, self).save(*args, **kwargs)
 
@@ -356,7 +357,7 @@ class Payroll(BaseModel):
     monthly_incentive = models.FloatField(blank=True, default=0.0)
     special_allowence_7 = models.FloatField(blank=True, default=0.0)
     providend_fund = models.FloatField(blank=True, default=0.0)
-
+    performance_bonus = models.FloatField(blank=True, default=0.0)
     gross_salary_this_month = models.FloatField(blank=True, default=0.0)
     net_salary_this_month = models.FloatField(blank=True, default=0.0)
 
@@ -406,16 +407,20 @@ class Payroll(BaseModel):
 
         _salary_package = SalaryPackage.objects.filter(
             employee=_employee_id).order_by('-id').first()
+
         _salary_package.monthly_incentive += self.monthly_incentive 
+
         self.special_allowence_7 = round((_salary_package.basic *0.07),2) if \
             self.difference_in_months(_employee.joining_date,self.salary_issued_date) > 11 else 0
-       
         _salary_package.special_allowence_7 += self.special_allowence_7
+
+        _salary_package.performance_bonus_given += self.performance_bonus
         _salary_package.save()
+
         _salary_package = SalaryPackage.objects.filter(
             employee=_employee_id).order_by('-id').first()
+            
         self.basic = _salary_package.basic if self.basic < 1 else self.basic
-
         self.house_rent = _salary_package.house_rent if self.house_rent < 1 else self.house_rent
         self.conveyance = _salary_package.conveyance if self.conveyance < 1 else self.conveyance
         self.medical = _salary_package.medical_bill if self.medical < 1 else self.medical
