@@ -1,3 +1,4 @@
+from Payroll.apps import employee
 from django.shortcuts import render
 from .models import *
 import xlsxwriter
@@ -20,8 +21,29 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import PayrollGenerator
+from django.views.decorators.csrf import requires_csrf_token
+from django.utils.decorators import method_decorator
 
 # Create your views here.
+class MonthlyEmployeePayrollSave(View):
+    def post(self,request):
+        print(request.Post)
+        return response.JsonResponse({"data": "Success"})
+class MonthlyEmployeePayroll(LoginRequiredMixin,View):
+    template_name = "employee/monthly-payroll.html"
+    context_object_name = "data"
+    
+    def get(self,request,*args,**kwargs):
+        object_list={}
+        object_list["company"]=self.kwargs.get('company')
+        object_list["months"]=[ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+        employee_list = Employee.objects.all().filter(company=self.kwargs.get('company'))
+        object_list["employee_data"] = zip([employee for employee in employee_list],[SalaryPackage.objects.get(employee= employee) for employee in employee_list ])
+        return render(request,self.template_name,object_list) 
+    def post(self,request,*args,**kwargs):
+        print(request.POST)
+        return response.JsonResponse({"data": "Success"})
+    
 class GenerateEmployeePayroll(FormView):
     template_name= "employee/payroll-generator.html"
     form_class=PayrollGenerator
@@ -50,9 +72,6 @@ class GenerateEmployeePayroll(FormView):
     #     object_list["employee"] = Employee.objects.get(official_email=email)
     #     return object_list
        
-    
-
-
 
 class EmployeeListView(LoginRequiredMixin,ListView):
     model = Employee

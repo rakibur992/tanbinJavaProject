@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load i18n static %}
+
+{% block scripts %}
+<script>
+$(function () {
+    var noty =  new Noty({
+        type: 'success',
+        layout: 'topLeft',
+        theme: 'nest',
+        text: 'Data Submitted Successfull',
+        timeout: '4000',
+        progressBar: true,
+        closeWith: ['click'],
+        killer: true,
+    })
+
+    // Handler for .ready() called.
+    $("#comboBox").on("click", function (event) {
+        var clicked = $(event.target)
+        console.log()
+        if (clicked.hasClass("dropdown-item")) {
+            $("#selectMonth").text(clicked.text())
+        }
+    });
+    $(".save").on("click", function (events) {
+        var clicked_pack = $(events.target).parent().parent()
+        var id = clicked_pack.attr('id')
+        var month = $("#selectMonth").text()
+        var monthly_incentive = clicked_pack.children(".monthly_incentive").text()
+        var performance_bonus = clicked_pack.children(".performance_bonus").text()
+        try {
+            monthly_incentive = parseInt(monthly_incentive)
+            performance_bonus = parseInt(performance_bonus)
+        } catch (err) {
+            console.log(err.message)
+        }
+        
+        csrf_token=$('{% csrf_token %}').val()
+        
+        $.ajax({
+            type: "POST",
+            url: "{% url 'MonthlyEmployeePayroll' company %}",
+            data:  {'data': "sucess",
+            'csrfmiddlewaretoken' : csrf_token
+            },
+            success: function(){
+                noty.show()
+            },
+            error: function(){
+              new Noty({
+                    type: 'error',
+                    layout: 'topLeft',
+                    theme: 'nest',
+                    text: 'Data Save Fail',
+                    timeout: '4000',
+                    progressBar: true,
+                    closeWith: ['click'],
+                    killer: true,
+               }).show()
+             
+            }
+          });
+        
+       
+        
+    });
+
+});
+</script>
+{% endblock  %}
+
+
+{% block content %}
+
+<h1 id ="Heading">Generate Montly Payroll {{company}}</h1>
+<div class="dropdown" id ="comboBox" style=" margin: 20px;">
+  <button class="btn btn-success dropdown-toggle" type="button" id="selectMonth" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Select Month
+  </button>
+  
+  <div class="dropdown-menu" aria-labelledby="Select Month">
+  {% for month in months %}
+    <a class="dropdown-item"  href="#">{{month}}</a>
+  {% endfor %}
+  </div>
+
+</div>
+{% csrf_token %}
+<table class="table">
+    <thead>
+        <tr class="table-primary">
+          <th scope="col">SN NO:</th>
+          <th scope="col">Employee Name</th>
+          <th scope="col">Basic</th>
+          <th scope="col">House Rent</th>
+          <th scope="col">Medical Bill</th>
+          <th scope="col">Conveyance</th>
+          <th scope="col">Monthly Incentive</th>
+          <th scope="col">Performance Bonus</th>
+          <th scope="col">Special Allowance</th>
+          <th scope="col">Save Data</th>
+          <th scope="col">Download Payslip</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for employee,salary_pack in employee_data %}
+        <tr id = "{{salary_pack.id}}">
+              <th scope="row">{{ forloop.counter }}</th>
+              <td scope="row">{{employee.name}}</td>
+              <td scope="row">{{salary_pack.basic}}</td>
+              <td scope="row">{{salary_pack.house_rent}}</td>
+              <td scope="row">{{salary_pack.medical_bill}}</td>
+              <td scope="row">{{salary_pack.conveyance}}</td>
+              <td scope="row" contenteditable="true" class="monthly_incentive">0</td>
+              <td scope="row" contenteditable="true" class= "performance_bonus">0</td>
+              <td scope="row">{{salary_pack.special_allowence_7}}</td>
+              <td><button type="button" class="btn btn-success btn-rounded btn-sm my-0 save" >Save</button></td>
+              <td><button type="button" class="btn btn-primary btn-rounded btn-sm my-0" >Download Payslip</button></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
