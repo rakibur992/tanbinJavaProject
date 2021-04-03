@@ -1,3 +1,4 @@
+from numpy import e
 from Payroll.apps import employee
 from django.shortcuts import render
 from .models import *
@@ -23,12 +24,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import PayrollGenerator
 from django.views.decorators.csrf import requires_csrf_token
 from django.utils.decorators import method_decorator
-
+from datetime import datetime
 # Create your views here.
-class MonthlyEmployeePayrollSave(View):
-    def post(self,request):
-        print(request.Post)
-        return response.JsonResponse({"data": "Success"})
 class MonthlyEmployeePayroll(LoginRequiredMixin,View):
     template_name = "employee/monthly-payroll.html"
     context_object_name = "data"
@@ -40,9 +37,22 @@ class MonthlyEmployeePayroll(LoginRequiredMixin,View):
         employee_list = Employee.objects.all().filter(company=self.kwargs.get('company'))
         object_list["employee_data"] = zip([employee for employee in employee_list],[SalaryPackage.objects.get(employee= employee) for employee in employee_list ])
         return render(request,self.template_name,object_list) 
+    
     def post(self,request,*args,**kwargs):
-        print(request.POST)
-        return response.JsonResponse({"data": "Success"})
+        id=request.POST.get('id')
+        monthly_incentive=float(request.POST.get('monthly_incentive')) 
+        performance_bonus=float(request.POST.get('performance_bonus')) 
+        salary_package = SalaryPackage.objects.get(id=id)
+        salary_date= request.POST.get('date')
+        try:
+            salary_issue_date=datetime.strptime(salary_date,"%m/%d/%Y").date()
+            salary_issue_date=salary_issue_date.replace(day=1)
+        except Exception as e:
+            return response.JsonResponse({"response": str(e)})
+        payroll = Payroll.objects.create(employee=salary_package.employee,salary_issued_date=salary_issue_date,
+                    monthly_incentive=monthly_incentive,performance_bonus=performance_bonus)
+        payroll.save()
+        return response.JsonResponse({"response": "Success"})
     
 class GenerateEmployeePayroll(FormView):
     template_name= "employee/payroll-generator.html"

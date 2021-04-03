@@ -22,8 +22,7 @@ urlpatterns = [
          name='GenerateEmployeePayroll'),
     path('monthlyEmployeePayroll/<str:company>',
          views.MonthlyEmployeePayroll.as_view(), name='MonthlyEmployeePayroll'),
-    path('monthlyEmployeePayrollSave',
-         views.MonthlyEmployeePayrollSave, name='MonthlyEmployeePayrollSave'),
+   
 
 
 ]

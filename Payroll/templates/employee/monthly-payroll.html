@@ -5,17 +5,15 @@
 {% block scripts %}
 <script>
 $(function () {
-    var noty =  new Noty({
-        type: 'success',
-        layout: 'topLeft',
-        theme: 'nest',
-        text: 'Data Submitted Successfull',
-        timeout: '4000',
-        progressBar: true,
-        closeWith: ['click'],
-        killer: true,
-    })
+    //$('#MonthsYears').datepicker();
+    $('.datepicker').datepicker();
 
+
+    // FOR DEMO PURPOSE
+    $('#reservationDate').on('change', function () {
+        var pickedDate = $('input').val();
+        $('#pickedDate').html(pickedDate);
+    });
     // Handler for .ready() called.
     $("#comboBox").on("click", function (event) {
         var clicked = $(event.target)
@@ -27,12 +25,13 @@ $(function () {
     $(".save").on("click", function (events) {
         var clicked_pack = $(events.target).parent().parent()
         var id = clicked_pack.attr('id')
-        var month = $("#selectMonth").text()
+        var date = $("#reservationDate").val()
+        console.log(date)
         var monthly_incentive = clicked_pack.children(".monthly_incentive").text()
         var performance_bonus = clicked_pack.children(".performance_bonus").text()
         try {
-            monthly_incentive = parseInt(monthly_incentive)
-            performance_bonus = parseInt(performance_bonus)
+            monthly_incentive = parseFloat(monthly_incentive)
+            performance_bonus = parseFloat(performance_bonus)
         } catch (err) {
             console.log(err.message)
         }
@@ -42,23 +41,23 @@ $(function () {
         $.ajax({
             type: "POST",
             url: "{% url 'MonthlyEmployeePayroll' company %}",
-            data:  {'data': "sucess",
+            data:{'id' : id,
+            'date': date,
+            'monthly_incentive': monthly_incentive,
+            'performance_bonus' : performance_bonus,
             'csrfmiddlewaretoken' : csrf_token
             },
-            success: function(){
-                noty.show()
+            success: function(response){
+              if (response['response']=='Success'){
+                noty('success','Data Submitted Successfull').show()
+              }
+              else{
+                noty('error',response['response']).show()
+              }
+              
             },
             error: function(){
-              new Noty({
-                    type: 'error',
-                    layout: 'topLeft',
-                    theme: 'nest',
-                    text: 'Data Save Fail',
-                    timeout: '4000',
-                    progressBar: true,
-                    closeWith: ['click'],
-                    killer: true,
-               }).show()
+             noty('error','Data Sent Fail').show()
              
             }
           });
@@ -66,6 +65,20 @@ $(function () {
        
         
     });
+    function noty (type,text){
+      return new Noty({
+        type: type,
+        layout: 'topLeft',
+        theme: 'nest',
+        text: text,
+        timeout: '4000',
+        progressBar: true,
+        closeWith: ['click'],
+        killer: true,
+    })
+
+    }
+    
 
 });
 </script>
@@ -74,19 +87,18 @@ $(function () {
 
 {% block content %}
 
-<h1 id ="Heading">Generate Montly Payroll {{company}}</h1>
-<div class="dropdown" id ="comboBox" style=" margin: 20px;">
-  <button class="btn btn-success dropdown-toggle" type="button" id="selectMonth" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Select Month
-  </button>
-  
-  <div class="dropdown-menu" aria-labelledby="Select Month">
-  {% for month in months %}
-    <a class="dropdown-item"  href="#">{{month}}</a>
-  {% endfor %}
-  </div>
+<h1 id ="Heading">Generate Montly Payroll for {{company}}</h1>
+    <div class="row">
+        <div class="col-md-3 ">
+            <div class="form-group mb-3">
+                <div class="datepicker date input-group p-0 shadow-sm" data-date-viewmode="years" data-date-minviewmode="months">
+                    <input type="text" placeholder="Choose a salary Issue date" class="form-control py-4 px-4" id="reservationDate" >
+                    <div class="input-group-append"><span class="input-group-text px-4"><i class="far fa-calendar-alt"></i></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-</div>
 {% csrf_token %}
 <table class="table">
     <thead>

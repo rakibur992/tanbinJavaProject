@@ -25,7 +25,7 @@ $(function () {
         var monthly_incentive = clicked_pack.children(".monthly_incentive").text()
         var performance_bonus = clicked_pack.children(".performance_bonus").text()
         try {
-            monthly_incentive = parseInt(monthly_incentive)
+            monthly_incentive = parseFloat(monthly_incentive)
             performance_bonus = parseInt(performance_bonus)
         } catch (err) {
             console.log(err.message)
