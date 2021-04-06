@@ -23,7 +23,7 @@
       
       <tr>
           <th scope="row">{{ forloop.counter }} </th>
-          <td> <a href="{% url 'employee-list' company.name %}">{{company.name}}</a>  </td>
+          <td> <a href="{% url 'MonthlyEmployeePayroll' company.name %}">{{company.name}}</a>  </td>
           <td>{{company.address}}</td>
           <td>{{company.contact_person}}</td>
         </tr>

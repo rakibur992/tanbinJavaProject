@@ -70,7 +70,7 @@ class Employee(BaseModel):
 
     official_email = models.CharField(
         primary_key=True, max_length=100, blank=True)
-    company=models.ForeignKey(Company,on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
     # company = models.ForeignKey(
     #     Company, on_delete=models.CASCADE, related_name="employees")
     # user = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -100,6 +100,7 @@ class Employee(BaseModel):
             self.providend_fund + self.gratuity
         super(Employee, self).save(*args, **kwargs)
 
+
 def save_salary_package(sender, instance, **kwargs):
 
     SalaryPackage.objects.create(employee=instance, basic=instance.basic,
@@ -110,17 +111,21 @@ def save_salary_package(sender, instance, **kwargs):
         employee=instance, financial_year=financial_year, yearly_investment_amount=0)
     EmployeeTaxAdvencePayment.objects.create(employee=instance)
 
+
 post_save.connect(save_salary_package, sender=Employee)
+
 
 class EmployeeTaxAdvencePayment(BaseModel):
     employee = models.ForeignKey(Employee, on_delete=models.PROTECT)
-    advance_tax_paid_last_financial_year=models.FloatField(default=0.0)
+    advance_tax_paid_last_financial_year = models.FloatField(default=0.0)
+
     def __str__(self):
-        return self.employee.name 
+        return self.employee.name
 
     class Meta:
         verbose_name = "Employee Tax Advence Payment"
         verbose_name_plural = "Employee Tax Advence Payments"
+
 
 class EmployeeGrade(BaseModel):
     employee = models.OneToOneField(
@@ -238,9 +243,9 @@ class SalaryPackage(BaseModel):
     providend_fund = models.FloatField(blank=True)
     gratuity = models.FloatField(blank=True)
     bonus = models.FloatField(blank=True)
-    special_allowence_7 = models.FloatField(blank=True,default=0.0)
-    monthly_incentive = models.FloatField(default=0.0,blank=True)
-    performance_bonus_given =  models.FloatField(default=0.0,blank=True)
+    special_allowence_7 = models.FloatField(blank=True, default=0.0)
+    monthly_incentive = models.FloatField(default=0.0, blank=True)
+    performance_bonus = models.FloatField(default=0.0, blank=True)
     # investment = models.FloatField(blank=True)
     gross_monthly_salary = models.FloatField(blank=True)
     gross_yearly_salary = models.FloatField(blank=True)
@@ -268,15 +273,17 @@ class SalaryPackage(BaseModel):
         self.gross_monthly_salary = self.basic + self.house_rent + self.medical_bill + \
             self.conveyance + self.mobile_bill + \
             self.providend_fund + self.gratuity
-        self.gross_yearly_salary = self.gross_monthly_salary * _salaries_this_year
-        self.salary_this_year = _salaries_this_year
         
-        self.total_salary_income = self.gross_yearly_salary + self.bonus+self.special_allowence_7+self.monthly_incentive+self.performance_bonus_given
+
+       
+        self.salary_this_year = _salaries_this_year
+
+        self.total_salary_income = self.gross_yearly_salary + self.bonus
 
         super(SalaryPackage, self).save(*args, **kwargs)
 
     def difference_in_months(self, start, end):
-        months=round((end-start).days/30)
+        months = round((end-start).days/30)
         if months > 11:
             return 12
         return months
@@ -394,9 +401,9 @@ class Payroll(BaseModel):
 
     def less_among_three(self, a, b, c):
         return a if a < b and a < c else b if b < c else c
-    def difference_in_months(self, start, end):
 
-        months=round((end-start).days/30)
+    def difference_in_months(self, start, end):
+        months = round((end-start).days/30)
         return months
 
     def save(self, *args, **kwargs):
@@ -408,19 +415,57 @@ class Payroll(BaseModel):
         self.financial_year = _financial_year.financial_year_end
         _salary_package = SalaryPackage.objects.filter(
             employee=_employee_id).order_by('-id').first()
+        try:
+            prev_payroll = Payroll.objects.all().filter(
+                employee=_employee, financial_year=_financial_year.financial_year_end)
+            _tax_paid_this_year_without_investment = sum(
+                [x.tax_this_month_without_investment for x in prev_payroll])
+            _tax_paid_this_year_with_rebate = sum(
+                [x.tax_this_month_with_rebate for x in prev_payroll])
+            _monthly_incentive_given = sum(
+                [x.monthly_incentive for x in prev_payroll])
+            _special_allowence_7_given = sum(
+                [x.special_allowence_7 for x in prev_payroll])
+            _performance_bonus_given = sum(
+                [x.performance_bonus for x in prev_payroll])
+        except Payroll.DoesNotExist:
+            _tax_paid_this_year_without_investment = 0
+            _tax_paid_this_year_with_rebate = 0
+            _monthly_incentive_given = 0
+            _special_allowence_7_given = 0
+            _performance_bonus_given = 0
 
-        _salary_package.monthly_incentive += self.monthly_incentive 
+        _monthly_incentive_given += self.monthly_incentive
 
-        self.special_allowence_7 = round((_salary_package.basic *0.07),2) if \
-            self.difference_in_months(_employee.joining_date,self.salary_issued_date) > 11 else 0
-        _salary_package.special_allowence_7 += self.special_allowence_7
+        self.special_allowence_7 = round((_salary_package.basic * 0.07), 2) if \
+            self.difference_in_months(_employee.joining_date, self.salary_issued_date) > 11 else 0
+        _special_allowence_7_given += self.special_allowence_7
 
-        _salary_package.performance_bonus_given += self.performance_bonus
+        _performance_bonus_given += self.performance_bonus
+
+        _salary_package.special_allowence_7 = self.special_allowence_7
+        _salary_package.monthly_incentive = self.monthly_incentive
+        _salary_package.performance_bonus = self.performance_bonus
+
+        _salary_given_till_current=0
+        try:
+            prev_payroll = Payroll.objects.all().filter(
+                employee=_employee, financial_year=_financial_year.financial_year_end)
+            _salary_given_till_current = sum(
+                [x.gross_salary_this_month for x in prev_payroll])
+            
+        except Payroll.DoesNotExist:
+            _salary_given_till_current = 0
+      
+        _salaries_left_this_year = self.difference_in_months(self.salary_issued_date,_financial_year.financial_year_end)
+
+        _salary_package.gross_yearly_salary = _salary_package.gross_monthly_salary * _salaries_left_this_year + _salary_given_till_current
+
         _salary_package.save()
 
         _salary_package = SalaryPackage.objects.filter(
             employee=_employee_id).order_by('-id').first()
-            
+
         self.basic = _salary_package.basic if self.basic < 1 else self.basic
         self.house_rent = _salary_package.house_rent if self.house_rent < 1 else self.house_rent
         self.conveyance = _salary_package.conveyance if self.conveyance < 1 else self.conveyance
@@ -442,15 +487,19 @@ class Payroll(BaseModel):
                 employee=_employee_id).order_by("-id").first().yearly_investment_amount
         except EmployeeInvestment.DoesNotExist:
             _employee_actual_investment = 10000000.0
-        
+
+        _tax_month_left = self.difference_in_months(
+            self.salary_issued_date, _financial_year.financial_year_end)
+
         # houserent exempt
         self.house_rent_basic_pay_50 = (_salary_package.basic *
                                         _salary_package.salary_this_year) / 2
         self.house_rent_as_per_salary = _salary_package.house_rent * \
             _salary_package.salary_this_year
-        temp_house_rent_as_per_salary = _house_rent.monthly_allowance * _salary_package.salary_this_year
+        temp_house_rent_as_per_salary = _house_rent.monthly_allowance * \
+            _salary_package.salary_this_year
 
-        self.house_rent_band = temp_house_rent_as_per_salary if temp_house_rent_as_per_salary < _house_rent.yearly_allowance else _house_rent.yearly_allowance  
+        self.house_rent_band = temp_house_rent_as_per_salary if temp_house_rent_as_per_salary < _house_rent.yearly_allowance else _house_rent.yearly_allowance
         self.house_rent_exempt = self.less_among_three(
             self.house_rent_basic_pay_50, self.house_rent_as_per_salary, self.house_rent_band)
 
@@ -467,13 +516,13 @@ class Payroll(BaseModel):
         self.medical_as_per_salary = _salary_package.medical_bill * \
             _salary_package.salary_this_year
         # temp_medical_as_per_salary = _medical.monthly_allowance * _salary_package.salary_this_year
-        self.medical_band =  _medical.yearly_allowance
+        self.medical_band = _medical.yearly_allowance
         # temp_medical_as_per_salary if temp_medical_as_per_salary < else _medical.yearly_allowance
         self.medical_exempt = self.less_among_three(
             self.medical_basic_pay_10, self.medical_as_per_salary, self.medical_band)
 
         # yearly taxable income
-        self.yearly_taxable_income = _salary_package.total_salary_income - \
+        self.yearly_taxable_income = _salary_package.total_salary_income + _special_allowence_7_given+_monthly_incentive_given+_performance_bonus_given+- \
             self.house_rent_exempt - self.conveyance_exempt - self.medical_exempt
 
         # yearly tax calculation without investment
@@ -487,24 +536,16 @@ class Payroll(BaseModel):
         else:
             self.tax_1 = self.tax_2 = self.tax_3 = self.tax_4 = self.tax = 0
             self.yearly_tax_without_investment = 5000
+        _advance_tax_paid_last_financial_year = EmployeeTaxAdvencePayment.objects.get(
+            employee=_employee).advance_tax_paid_last_financial_year
+        
 
+        _tax_need_to_pay_this_year = self.yearly_tax_without_investment - \
+            _tax_paid_this_year_without_investment - _advance_tax_paid_last_financial_year
 
-        try:
-            prev_payroll = Payroll.objects.all().filter(employee=_employee,financial_year=_financial_year.financial_year_end) 
-            _tax_paid_this_year_without_investment= sum([x.tax_this_month_without_investment for x in prev_payroll])
-            _tax_paid_this_year_with_rebate = sum([x.tax_this_month_with_rebate for x in prev_payroll])
-        except Payroll.DoesNotExist:
-            _tax_paid_this_year_without_investment =0
-            _tax_paid_this_year_with_rebate = 0
-
-            
-        _advance_tax_paid_last_financial_year = EmployeeTaxAdvencePayment.objects.get(employee=_employee).advance_tax_paid_last_financial_year
-        _tax_month_left = self.difference_in_months(self.salary_issued_date,_financial_year.financial_year_end)
-        _tax_need_to_pay_this_year = self.yearly_tax_without_investment  - _tax_paid_this_year_without_investment - _advance_tax_paid_last_financial_year
-
-        self.tax_this_month_without_investment = round(_tax_need_to_pay_this_year/_tax_month_left, 2)
-        # _salary_package.tax_paid_this_year_without_investment += round(self.tax_this_month_without_investment,2)      
-       
+        self.tax_this_month_without_investment = round(
+            _tax_need_to_pay_this_year/_tax_month_left, 2)
+        # _salary_package.tax_paid_this_year_without_investment += round(self.tax_this_month_without_investment,2)
 
         self.gross_salary_this_month = _salary_package.gross_monthly_salary
         self.salary_this_month_without_investment = round(self.gross_salary_this_month -
@@ -522,14 +563,14 @@ class Payroll(BaseModel):
 
         self.investment_rebate = (
             self.investment_credit / 100) * _investment_rebate_percentage
-    
+
         self.yearly_tax_with_investment_rebate = round(self.yearly_tax_without_investment -
                                                        self.investment_rebate, 2)
-        _tax_need_to_pay_this_year_with_rebate = self.yearly_tax_with_investment_rebate - _tax_paid_this_year_with_rebate -_advance_tax_paid_last_financial_year
-    
+        _tax_need_to_pay_this_year_with_rebate = self.yearly_tax_with_investment_rebate - \
+            _tax_paid_this_year_with_rebate - _advance_tax_paid_last_financial_year
 
         self.tax_this_month_with_rebate = round(
-            _tax_need_to_pay_this_year_with_rebate  / _tax_month_left, 2)
+            _tax_need_to_pay_this_year_with_rebate / _tax_month_left, 2)
         # _salary_package.tax_paid_this_year_with_rebate += round(self.tax_this_month_with_rebate)
         # _salary_package.save()
         # self.tax_this_month_with_rebate = round(
@@ -567,10 +608,9 @@ class Payroll(BaseModel):
 
         self. yearly_tax_without_investment = self.tax_1 + \
             self.tax_2 + self.tax_3 + self.tax_4 + self.tax_5
-        
+
         if self.yearly_tax_without_investment <= 5000:
             self.yearly_tax_without_investment = 5000
-
 
     def _tax_calculation(self, _base, _tax_percentage, _tax_bracket):
 
@@ -590,6 +630,7 @@ class Payroll(BaseModel):
         _tax = (_tax_bracket / 100) * _tax_percentage
 
         return _money, _tax
+
     def _tax_rule(self, rule_number):
         _tax_rule = TaxRule.objects.all().order_by("id")
         return _tax_rule[rule_number].TAX_RULE_CHOICES[_tax_rule[rule_number].tax_percentage-1][1], _tax_rule[rule_number].tax_bracket

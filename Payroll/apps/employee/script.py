@@ -19,6 +19,7 @@ for email,incentive in zip (df['email'],df['incentive'].fillna(0)):
     print(sp)
     sp.monthly_incentive=0
     sp.special_allowence_7=0
+    sp.performance_bonus=0
     # sp.tax_paid_this_year_without_investment=0
     # sp.tax_paid_this_year_with_rebate=0
     sp.save()
