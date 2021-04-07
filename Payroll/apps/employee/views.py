@@ -31,29 +31,53 @@ class MonthlyEmployeePayroll(LoginRequiredMixin,View):
     context_object_name = "data"
     
     def get(self,request,*args,**kwargs):
-        object_list={}
-        object_list["company"]=self.kwargs.get('company')
-        object_list["months"]=[ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
-        employee_list = Employee.objects.all().filter(company=self.kwargs.get('company'))
-        object_list["employee_data"] = zip([employee for employee in employee_list],[SalaryPackage.objects.get(employee= employee) for employee in employee_list ])
-        return render(request,self.template_name,object_list) 
+            object_list={}
+            object_list["company"]=self.kwargs.get('company')
+            # object_list["months"]=[ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+            employee_list = Employee.objects.all().filter(company=self.kwargs.get('company'))
+            employees = []
+            salary_packs = []
+            button_id=[]
+            for employee in employee_list :
+                employees.append(employee)
+                salary_pack = SalaryPackage.objects.get(employee= employee)
+                salary_packs.append(salary_pack)
+                button_id.append("saveBtn"+str(salary_pack.id))
+            object_list["employee_data"] = zip(employees,salary_packs,button_id)
+            return render(request,self.template_name,object_list) 
     
     def post(self,request,*args,**kwargs):
-        id=request.POST.get('id')
-        monthly_incentive=float(request.POST.get('monthly_incentive')) 
-        performance_bonus=float(request.POST.get('performance_bonus')) 
-        salary_package = SalaryPackage.objects.get(id=id)
-        salary_date= request.POST.get('date')
-        try:
-            salary_issue_date=datetime.strptime(salary_date,"%m/%d/%Y").date()
-            salary_issue_date=salary_issue_date.replace(day=1)
-        except Exception as e:
-            return response.JsonResponse({"response": str(e)})
-        payroll = Payroll.objects.create(employee=salary_package.employee,salary_issued_date=salary_issue_date,
-                    monthly_incentive=monthly_incentive,performance_bonus=performance_bonus)
-        payroll.save()
-        return response.JsonResponse({"response": "Success"})
-    
+        if request.POST.get('id') != None:
+            id=request.POST.get('id')
+            monthly_incentive=float(request.POST.get('monthly_incentive')) 
+            performance_bonus=float(request.POST.get('performance_bonus')) 
+            salary_package = SalaryPackage.objects.get(id=id)
+            salary_date= request.POST.get('date')
+            try:
+                salary_issue_date=datetime.strptime(salary_date,"%m/%d/%Y").date()
+                salary_issue_date=salary_issue_date.replace(day=1)
+            except Exception as e:
+                return response.JsonResponse({"response": str(e)})
+            payroll = Payroll.objects.create(employee=salary_package.employee,salary_issued_date=salary_issue_date,
+                        monthly_incentive=monthly_incentive,performance_bonus=performance_bonus)
+            payroll.save()
+            payrolls = Payroll.objects.all().filter(salary_issued_date=salary_issue_date)
+            all_id = list(SalaryPackage.objects.values_list("id",flat=True))
+            saved_id = [SalaryPackage.objects.get(employee=payroll.employee).id for payroll in payrolls]
+            return response.JsonResponse({"response": "Success","all_id" : all_id,"saved_id": saved_id})
+        elif request.POST.get('pickedDate') != None:
+            payroll_date = request.POST.get('pickedDate')
+            payroll_date = datetime.strptime(payroll_date,"%m/%d/%Y").date()
+            payroll_date = payroll_date.replace(day=1)
+            payrolls = Payroll.objects.all().filter(salary_issued_date=payroll_date)
+            all_id = list(SalaryPackage.objects.values_list("id",flat=True))
+            saved_id = [SalaryPackage.objects.get(employee=payroll.employee).id for payroll in payrolls]
+            return response.JsonResponse({"all_id" : all_id,"saved_id": saved_id})
+            
+
+
+
+        
 class GenerateEmployeePayroll(FormView):
     template_name= "employee/payroll-generator.html"
     form_class=PayrollGenerator
