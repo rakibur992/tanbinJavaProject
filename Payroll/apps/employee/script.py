@@ -10,8 +10,8 @@ dates=[date for date in df['date'].dropna()]
 
 for date in dates:
     for email,incentive in zip (df['email'],df['incentive'].fillna(0)):
-        payroll=Payroll.objects.create(employee=Employee.objects.get(pk=email),monthly_incentive=incentive,salary_issued_date=datetime.strptime(date,"%m/%d/%Y").date())
-    payroll.save()
+        Payroll.objects.create(employee=Employee.objects.get(pk=email),monthly_incentive=incentive,salary_issued_date=datetime.strptime(date,"%m/%d/%Y").date())
+    
 
 # Reset salary Package
 for email,incentive in zip (df['email'],df['incentive'].fillna(0)):
@@ -27,3 +27,5 @@ for email,incentive in zip (df['email'],df['incentive'].fillna(0)):
 prev_payroll = Payroll.objects.all().filter(employee=Employee.objects.get(pk="rahamatullah@fashionlinq.com"),financial_year=FinancialYear.objects.get(current_year=True).financial_year_end) 
 sum([x.tax_this_month_without_investment for x in prev_payroll])
 sum([x.tax_this_month_with_rebate for x in prev_payroll])
+for x in prev_payroll[0]:
+    print(x)

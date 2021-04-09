@@ -7,11 +7,10 @@ from bootstrap_datepicker_plus import DatePickerInput
 class PayrollGenerator (forms.ModelForm):
     class Meta :
         model = Payroll
-        fields = ("monthly_incentive","performance_bonus","salary_issued_date",)
+        fields = ("monthly_incentive","salary_issued_date",)
         widgets = {
             # "employee": forms.Select(attrs={'class': 'form-control'}),
             'monthly_incentive' :forms.TextInput(attrs={'class': 'form-control'}),
-            'performance_bonus' :forms.TextInput(attrs={'class': 'form-control'}),
             'salary_issued_date': DatePickerInput(format='%m/%d/%Y')   
         }
 

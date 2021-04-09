@@ -9,7 +9,7 @@ from Payroll.apps.core.models import BaseModel
 from Payroll.apps.user.models import User
 from Payroll.apps.company.models import Company
 from dateutil.relativedelta import relativedelta
-
+from django.db.models import F
 # Create your models here.
 
 
@@ -274,11 +274,9 @@ class SalaryPackage(BaseModel):
             self.conveyance + self.mobile_bill + \
             self.providend_fund + self.gratuity
         
-
-       
         self.salary_this_year = _salaries_this_year
 
-        self.total_salary_income = self.gross_yearly_salary + self.bonus
+        self.total_salary_income = self.gross_yearly_salary + self.bonus +self.performance_bonus
 
         super(SalaryPackage, self).save(*args, **kwargs)
 
@@ -365,7 +363,6 @@ class Payroll(BaseModel):
     monthly_incentive = models.FloatField(blank=True, default=0.0)
     special_allowence_7 = models.FloatField(blank=True, default=0.0)
     providend_fund = models.FloatField(blank=True, default=0.0)
-    performance_bonus = models.FloatField(blank=True, default=0.0)
     gross_salary_this_month = models.FloatField(blank=True, default=0.0)
     net_salary_this_month = models.FloatField(blank=True, default=0.0)
 
@@ -413,8 +410,22 @@ class Payroll(BaseModel):
         _employee_id = self.employee.official_email
         _financial_year = FinancialYear.objects.get(current_year=True)
         self.financial_year = _financial_year.financial_year_end
-        _salary_package = SalaryPackage.objects.filter(
-            employee=_employee_id).order_by('-id').first()
+    
+        _salary_package_all= SalaryPackage.objects.filter(employee=_employee_id).order_by('-id')
+
+        _salary_package_new = _salary_package_all.first()
+        _salary_package_old = None
+        if len(_salary_package_all)> 1:
+            _last_increment_date = _salary_package_new.last_increment_date 
+            _salary_increment_month = self.difference_in_months(_last_increment_date,self.salary_issued_date)
+            if _last_increment_date <= self.salary_issued_date :
+                _salary_package_old = _salary_package_all[1]
+            else :
+                _salary_package_new = _salary_package_all[1]
+                _salary_package_old = _salary_package_new
+        else :
+            _salary_package_old = _salary_package_new
+
         try:
             prev_payroll = Payroll.objects.all().filter(
                 employee=_employee, financial_year=_financial_year.financial_year_end)
@@ -426,28 +437,27 @@ class Payroll(BaseModel):
                 [x.monthly_incentive for x in prev_payroll])
             _special_allowence_7_given = sum(
                 [x.special_allowence_7 for x in prev_payroll])
-            _performance_bonus_given = sum(
-                [x.performance_bonus for x in prev_payroll])
         except Payroll.DoesNotExist:
             _tax_paid_this_year_without_investment = 0
             _tax_paid_this_year_with_rebate = 0
             _monthly_incentive_given = 0
             _special_allowence_7_given = 0
-            _performance_bonus_given = 0
+            
 
         _monthly_incentive_given += self.monthly_incentive
 
-        self.special_allowence_7 = round((_salary_package.basic * 0.07), 2) if \
+        self.special_allowence_7 = round((_salary_package_new.basic * 0.07), 2) if \
             self.difference_in_months(_employee.joining_date, self.salary_issued_date) > 11 else 0
         _special_allowence_7_given += self.special_allowence_7
 
-        _performance_bonus_given += self.performance_bonus
+        
 
-        _salary_package.special_allowence_7 = self.special_allowence_7
-        _salary_package.monthly_incentive = self.monthly_incentive
-        _salary_package.performance_bonus = self.performance_bonus
-
+        _salary_package_new.special_allowence_7 = self.special_allowence_7
+        _salary_package_new.monthly_incentive = self.monthly_incentive
+        
+        
         _salary_given_till_current=0
+
         try:
             prev_payroll = Payroll.objects.all().filter(
                 employee=_employee, financial_year=_financial_year.financial_year_end)
@@ -456,23 +466,22 @@ class Payroll(BaseModel):
             
         except Payroll.DoesNotExist:
             _salary_given_till_current = 0
-      
-        _salaries_left_this_year = self.difference_in_months(self.salary_issued_date,_financial_year.financial_year_end)
+        
+        _tax_month_left = self.difference_in_months(
+            self.salary_issued_date, _financial_year.financial_year_end)
+        _salaries_left_this_year = _tax_month_left
 
-        _salary_package.gross_yearly_salary = _salary_package.gross_monthly_salary * _salaries_left_this_year + _salary_given_till_current
+        _salary_package_new.gross_yearly_salary = (_salary_package_new.gross_monthly_salary * _salaries_left_this_year) + _salary_given_till_current
+        _salary_package_new.save()
+        _salary_package_new.refresh_from_db()
 
-        _salary_package.save()
-
-        _salary_package = SalaryPackage.objects.filter(
-            employee=_employee_id).order_by('-id').first()
-
-        self.basic = _salary_package.basic if self.basic < 1 else self.basic
-        self.house_rent = _salary_package.house_rent if self.house_rent < 1 else self.house_rent
-        self.conveyance = _salary_package.conveyance if self.conveyance < 1 else self.conveyance
-        self.medical = _salary_package.medical_bill if self.medical < 1 else self.medical
-        self.bonus = _salary_package.bonus if self.bonus < 1 else self.bonus
-        self.mobile = _salary_package.mobile_bill if self.mobile < 1 else self.mobile
-        self.providend_fund = _salary_package.providend_fund if self.providend_fund < 1 else self.providend_fund
+        self.basic = _salary_package_new.basic if self.basic < 1 else self.basic
+        self.house_rent = _salary_package_new.house_rent if self.house_rent < 1 else self.house_rent
+        self.conveyance = _salary_package_new.conveyance if self.conveyance < 1 else self.conveyance
+        self.medical = _salary_package_new.medical_bill if self.medical < 1 else self.medical
+        self.bonus = _salary_package_new.bonus if self.bonus < 1 else self.bonus
+        self.mobile = _salary_package_new.mobile_bill if self.mobile < 1 else self.mobile
+        self.providend_fund = _salary_package_new.providend_fund if self.providend_fund < 1 else self.providend_fund
         _tax_exempt = TaxableIncome.objects.all()
         _medical = TaxableIncome.objects.get(sector='Medical')
         _house_rent = TaxableIncome.objects.get(sector='House Rent')
@@ -488,33 +497,36 @@ class Payroll(BaseModel):
         except EmployeeInvestment.DoesNotExist:
             _employee_actual_investment = 10000000.0
 
-        _tax_month_left = self.difference_in_months(
-            self.salary_issued_date, _financial_year.financial_year_end)
+        
+
 
         # houserent exempt
-        self.house_rent_basic_pay_50 = (_salary_package.basic *
-                                        _salary_package.salary_this_year) / 2
-        self.house_rent_as_per_salary = _salary_package.house_rent * \
-            _salary_package.salary_this_year
+        self.house_rent_basic_pay_50 = (_salary_package_old.basic * (12 - _tax_month_left) \
+                                        +_salary_package_new.basic * _tax_month_left ) / 2
+        self.house_rent_as_per_salary = (_salary_package_old.house_rent * (12 - _tax_month_left) \
+                                        +_salary_package_new.house_rent * _tax_month_left )
+        
         temp_house_rent_as_per_salary = _house_rent.monthly_allowance * \
-            _salary_package.salary_this_year
+            _salary_package_new.salary_this_year
 
         self.house_rent_band = temp_house_rent_as_per_salary if temp_house_rent_as_per_salary < _house_rent.yearly_allowance else _house_rent.yearly_allowance
         self.house_rent_exempt = self.less_among_three(
             self.house_rent_basic_pay_50, self.house_rent_as_per_salary, self.house_rent_band)
 
         # conveyance
-        self.conveyance_as_per_salary = _salary_package.conveyance * \
-            _salary_package.salary_this_year
+        self.conveyance_as_per_salary =(_salary_package_old.conveyance * (12 - _tax_month_left) \
+                                        +_salary_package_new.conveyance * _tax_month_left )
+
         self.conveyance_band = _transport.yearly_allowance
         self.conveyance_exempt = self.less_among_three(
             1000000, self.conveyance_as_per_salary, self.conveyance_band)
 
         # medical exempt
-        self.medical_basic_pay_10 = (_salary_package.basic *
-                                     _salary_package.salary_this_year) / 10
-        self.medical_as_per_salary = _salary_package.medical_bill * \
-            _salary_package.salary_this_year
+        self.medical_basic_pay_10 = (_salary_package_old.basic * (12 - _tax_month_left) \
+                                        +_salary_package_new.basic * _tax_month_left ) / 10
+                                     
+        self.medical_as_per_salary =(_salary_package_old.medical_bill * (12 - _tax_month_left) \
+                                        +_salary_package_new.medical_bill * _tax_month_left )
         # temp_medical_as_per_salary = _medical.monthly_allowance * _salary_package.salary_this_year
         self.medical_band = _medical.yearly_allowance
         # temp_medical_as_per_salary if temp_medical_as_per_salary < else _medical.yearly_allowance
@@ -522,7 +534,7 @@ class Payroll(BaseModel):
             self.medical_basic_pay_10, self.medical_as_per_salary, self.medical_band)
 
         # yearly taxable income
-        self.yearly_taxable_income = _salary_package.total_salary_income + _special_allowence_7_given+_monthly_incentive_given+_performance_bonus_given+- \
+        self.yearly_taxable_income = _salary_package_new.total_salary_income + _special_allowence_7_given+_monthly_incentive_given- \
             self.house_rent_exempt - self.conveyance_exempt - self.medical_exempt
 
         # yearly tax calculation without investment
@@ -547,7 +559,7 @@ class Payroll(BaseModel):
             _tax_need_to_pay_this_year/_tax_month_left, 2)
         # _salary_package.tax_paid_this_year_without_investment += round(self.tax_this_month_without_investment,2)
 
-        self.gross_salary_this_month = _salary_package.gross_monthly_salary
+        self.gross_salary_this_month = _salary_package_new.gross_monthly_salary
         self.salary_this_month_without_investment = round(self.gross_salary_this_month -
                                                           self.tax_this_month_without_investment, 2)
         # yearly tax calculation with investment
